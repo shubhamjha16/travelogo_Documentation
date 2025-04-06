@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travelogo - Plan Creation & Friend Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header-blue {
+            background-color: #1e88e5;
+            color: white;
+        }
+        .custom-input {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            background-color: #f9f9f9;
+            transition: all 0.3s;
+        }
+        .custom-input:focus {
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+            outline: none;
+        }
+        .btn-primary {
+            background-color: #1e88e5;
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #1976d2;
+        }
+        .btn-success {
+            background-color: #4caf50;
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-success:hover {
+            background-color: #43a047;
+        }
+        .btn-danger {
+            background-color: #f44336;
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-danger:hover {
+            background-color: #e53935;
+        }
+        .friend-card {
+            transition: all 0.3s;
+        }
+        .friend-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        .avatar {
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #757575;
+            font-weight: bold;
+        }
+        .activity-card {
+            border-left: 3px solid #1e88e5;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container p-4 my-8">
+        <!-- App Header -->
+        <header class="flex items-center justify-between mb-8">
+            <div class="flex items-center">
+                <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white mr-3">
+                    <i class="fas fa-plane text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Travelogo</h1>
+            </div>
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full avatar mr-3">
+                    <span>JD</span>
+                </div>
+                <span class="font-medium">John Doe</span>
+            </div>
+        </header>
+
+        <!-- Plan Creation Screen -->
+        <section class="mb-16">
+            <div class="header-blue p-6 rounded-t-lg">
+                <h2 class="text-2xl font-bold">Create New Trip</h2>
+                <p class="text-blue-100">Plan your next adventure</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-b-lg shadow-sm mb-8">
+                <form>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-gray-700 mb-2" for="trip-title">Trip Title</label>
+                            <input type="text" id="trip-title" class="w-full custom-input" placeholder="Summer Vacation 2024">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2" for="destination">Destination</label>
+                            <input type="text" id="destination" class="w-full custom-input" placeholder="Paris, France">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-gray-700 mb-2" for="start-date">Start Date</label>
+                            <input type="date" id="start-date" class="w-full custom-input">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2" for="end-date">End Date</label>
+                            <input type="date" id="end-date" class="w-full custom-input">
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2" for="description">Description</label>
+                        <textarea id="description" rows="4" class="w-full custom-input" placeholder="Describe your trip plans..."></textarea>
+                    </div>
+
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Activities</h3>
+                            <button type="button" class="text-blue-600 flex items-center">
+                                <i class="fas fa-plus mr-1"></i> Add Activity
+                            </button>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Activity 1 -->
+                            <div class="bg-gray-50 p-4 rounded-lg activity-card">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-1 text-sm">Date</label>
+                                        <input type="date" class="w-full custom-input">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 mb-1 text-sm">Time</label>
+                                        <input type="time" class="w-full custom-input">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-gray-700 mb-1 text-sm">Activity</label>
+                                        <input type="text" class="w-full custom-input" placeholder="Visit Eiffel Tower">
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <label class="block text-gray-700 mb-1 text-sm">Location</label>
+                                    <input type="text" class="w-full custom-input" placeholder="Eiffel Tower, Paris">
+                                </div>
+                                <div class="mt-2 text-right">
+                                    <button type="button" class="text-red-500 text-sm">
+                                        <i class="fas fa-trash-alt"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Activity 2 -->
+                            <div class="bg-gray-50 p-4 rounded-lg activity-card">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-1 text-sm">Date</label>
+                                        <input type="date" class="w-full custom-input">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 mb-1 text-sm">Time</label>
+                                        <input type="time" class="w-full custom-input">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-gray-700 mb-1 text-sm">Activity</label>
+                                        <input type="text" class="w-full custom-input" placeholder="Louvre Museum Tour">
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <label class="block text-gray-700 mb-1 text-sm">Location</label>
+                                    <input type="text" class="w-full custom-input" placeholder="Louvre Museum, Paris">
+                                </div>
+                                <div class="mt-2 text-right">
+                                    <button type="button" class="text-red-500 text-sm">
+                                        <i class="fas fa-trash-alt"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Trip Participants</h3>
+                        <div class="flex flex-wrap">
+                            <div class="mr-4 mb-3 p-2 bg-blue-100 rounded-lg flex items-center">
+                                <div class="w-8 h-8 rounded-full avatar mr-2">
+                                    <span>JD</span>
+                                </div>
+                                <span class="mr-2">John Doe (You)</span>
+                            </div>
+                            <div class="mr-4 mb-3 p-2 bg-blue-100 rounded-lg flex items-center">
+                                <div class="w-8 h-8 rounded-full avatar mr-2">
+                                    <span>AS</span>
+                                </div>
+                                <span class="mr-2">Alice Smith</span>
+                                <button class="text-red-500">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <button class="mr-4 mb-3 p-2 bg-blue-50 rounded-lg flex items-center text-blue-600 hover:bg-blue-100 transition">
+                                <i class="fas fa-plus mr-2"></i> Add Friend
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" class="px-6 py-3 rounded-lg border border-gray-300">Cancel</button>
+                        <button type="submit" class="px-6 py-3 rounded-lg btn-primary">Create Trip</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Friend Management Screen -->
+        <section>
+            <div class="header-blue p-6 rounded-t-lg">
+                <h2 class="text-2xl font-bold">Friend Management</h2>
+                <p class="text-blue-100">Connect with travel buddies</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-b-lg shadow-sm">
+                <!-- Search and Add Friends -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Add New Friends</h3>
+                    <div class="flex items-stretch">
+                        <input type="text" placeholder="Enter email address" class="flex-grow custom-input rounded-r-none">
+                        <button class="btn-primary px-4 py-2 rounded-r-lg flex items-center">
+                            <i class="fas fa-search mr-2"></i> Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Friend Requests -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Friend Requests (2)</h3>
+                    <div class="space-y-4">
+                        <div class="border rounded-lg p-4 shadow-sm flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full avatar mr-4">
+                                    <span>MB</span>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Michael Brown</p>
+                                    <p class="text-gray-600 text-sm">michael.brown@example.com</p>
+                                </div>
+                            </div>
+                            <div class="space-x-2">
+                                <button class="btn-success px-4 py-2 rounded-lg text-sm">Accept</button>
+                                <button class="btn-danger px-4 py-2 rounded-lg text-sm">Decline</button>
+                            </div>
+                        </div>
+
+                        <div class="border rounded-lg p-4 shadow-sm flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full avatar mr-4">
+                                    <span>EJ</span>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Emma Johnson</p>
+                                    <p class="text-gray-600 text-sm">emma.johnson@example.com</p>
+                                </div>
+                            </div>
+                            <div class="space-x-2">
+                                <button class="btn-success px-4 py-2 rounded-lg text-sm">Accept</button>
+                                <button class="btn-danger px-4 py-2 rounded-lg text-sm">Decline</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Friends List -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Your Friends (5)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Friend 1 -->
+                        <div class="border rounded-lg p-4 shadow-sm flex items-center justify-between friend-card">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full avatar mr-4">
+                                    <span>AS</span>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Alice Smith</p>
+                                    <p class="text-gray-600 text-sm">3 trips together</p>
+                                </div>
+                            </div>
+                            <div class="space-x-2">
+                                <button class="text-blue-600">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                                <button class="text-red-500">
+                                    <i class="fas fa-user-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Friend 2 -->
+                        <div class="border rounded-lg p-4 shadow-sm flex items-center justify-between friend-card">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full avatar mr-4">
+                                    <span>RW</span>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Robert Wilson</p>
+                                    <p class="text-gray-600 text-sm">1 trip together</p>
+                                </div>
+                            </div>
+                            <div class="space-x-2">
+                                <button class="text-blue-600">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                                <button class="text-red-500">
+                                    <i class="fas fa-user-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Friend 3 -->
+                        <div class="border rounded-lg p-4 shadow-sm flex items-center justify-between friend-card">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full avatar mr-4">
+                                    <span>JT</span>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Jenny Thompson</p>
+                                    <p class="text-gray-600 text-sm">5 trips together</p>
+                                </div>
+                            </div>
+                            <div class="space-x-2">
+                                <button class="text-blue-600">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                                <button class="text-red-500">
+                                    <i class="fas fa-user-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Friend 4 -->
+                        <div class="border rounded-lg p-4 shadow-sm flex items-center justify-between friend-card">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full avatar mr-4">
+                                    <span>DM</span>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">David Miller</p>
+                                    <p class="text-gray-600 text-sm">2 trips together</p>
+                                </div>
+                            </div>
+                            <div class="space-x-2">
+                                <button class="text-blue-600">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                                <button class="text-red-500">
+                                    <i class="fas fa-user-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Friend 5 -->
+                        <div class="border rounded-lg p-4 shadow-sm flex items-center justify-between friend-card">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full avatar mr-4">
+                                    <span>SJ</span>
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Sophia Jones</p>
+                                    <p class="text-gray-600 text-sm">No trips yet</p>
+                                </div>
+                            </div>
+                            <div class="space-x-2">
+                                <button class="text-blue-600">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                                <button class="text-red-500">
+                                    <i class="fas fa-user-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>Travelogo - Plan, Share, Experience © 2024</p>
+        </footer>
+    </div>
+</body>
+</html>

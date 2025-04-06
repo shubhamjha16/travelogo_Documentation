@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travelogo Authentication Screens</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .phone-frame {
+            border: 12px solid #111;
+            border-radius: 36px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .phone-frame:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background-color: #111;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+        .code-block {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-blue-600 mb-4">Travelogo Authentication Screens</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                The authentication flow for the Travelogo app includes Login, Sign Up, and Forgot Password screens, implemented using React Native with Firebase authentication.
+            </p>
+        </header>
+
+        <div class="mb-16">
+            <h2 class="text-2xl font-bold text-blue-700 mb-6">Authentication Screen Code Implementation</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Login Screen -->
+                <div class="flex flex-col">
+                    <div class="phone-frame w-64 h-500 mx-auto bg-white">
+                        <div class="p-4 h-full">
+                            <div class="flex justify-center mb-8 mt-10">
+                                <div class="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-3xl"><i class="fas fa-plane"></i></span>
+                                </div>
+                            </div>
+                            <h2 class="text-2xl font-bold text-center mb-6">Travelogo</h2>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                                <div class="bg-gray-100 rounded p-2 flex items-center">
+                                    <i class="fas fa-envelope text-gray-500 mr-2"></i>
+                                    <div class="w-full h-4 bg-gray-300 rounded"></div>
+                                </div>
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                                <div class="bg-gray-100 rounded p-2 flex items-center">
+                                    <i class="fas fa-lock text-gray-500 mr-2"></i>
+                                    <div class="w-full h-4 bg-gray-300 rounded"></div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <button class="w-full bg-blue-500 text-white py-2 rounded font-bold">
+                                    Log In
+                                </button>
+                            </div>
+                            <div class="text-center mb-4">
+                                <a href="#" class="text-blue-500 text-sm">Forgot Password?</a>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600">Don't have an account? <a href="#" class="text-blue-500 font-bold">Sign Up</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mt-4">Login Screen</h3>
+                </div>
+
+                <!-- Sign Up Screen -->
+                <div class="flex flex-col">
+                    <div class="phone-frame w-64 h-500 mx-auto bg-white">
+                        <div class="p-4 h-full">
+                            <div class="flex justify-center mb-6 mt-6">
+                                <div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-2xl"><i class="fas fa-plane"></i></span>
+                                </div>
+                            </div>
+                            <h2 class="text-xl font-bold text-center mb-4">Create Account</h2>
+                            <div class="mb-3">
+                                <label class="block text-gray-700 text-sm font-bold mb-1">Full Name</label>
+                                <div class="bg-gray-100 rounded p-2 flex items-center">
+                                    <i class="fas fa-user text-gray-500 mr-2"></i>
+                                    <div class="w-full h-4 bg-gray-300 rounded"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="block text-gray-700 text-sm font-bold mb-1">Email</label>
+                                <div class="bg-gray-100 rounded p-2 flex items-center">
+                                    <i class="fas fa-envelope text-gray-500 mr-2"></i>
+                                    <div class="w-full h-4 bg-gray-300 rounded"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="block text-gray-700 text-sm font-bold mb-1">Password</label>
+                                <div class="bg-gray-100 rounded p-2 flex items-center">
+                                    <i class="fas fa-lock text-gray-500 mr-2"></i>
+                                    <div class="w-full h-4 bg-gray-300 rounded"></div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-1">Confirm Password</label>
+                                <div class="bg-gray-100 rounded p-2 flex items-center">
+                                    <i class="fas fa-lock text-gray-500 mr-2"></i>
+                                    <div class="w-full h-4 bg-gray-300 rounded"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <button class="w-full bg-blue-500 text-white py-2 rounded font-bold">
+                                    Sign Up
+                                </button>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600">Already have an account? <a href="#" class="text-blue-500 font-bold">Log In</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mt-4">Sign Up Screen</h3>
+                </div>
+
+                <!-- Forgot Password Screen -->
+                <div class="flex flex-col">
+                    <div class="phone-frame w-64 h-500 mx-auto bg-white">
+                        <div class="p-4 h-full">
+                            <div class="mb-2 mt-2">
+                                <button class="text-blue-500">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                            </div>
+                            <div class="flex justify-center mb-6 mt-4">
+                                <div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-2xl"><i class="fas fa-key"></i></span>
+                                </div>
+                            </div>
+                            <h2 class="text-xl font-bold text-center mb-2">Forgot Password</h2>
+                            <p class="text-center text-gray-600 text-sm mb-6">
+                                Enter your email address and we'll send you a link to reset your password.
+                            </p>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                                <div class="bg-gray-100 rounded p-2 flex items-center">
+                                    <i class="fas fa-envelope text-gray-500 mr-2"></i>
+                                    <div class="w-full h-4 bg-gray-300 rounded"></div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <button class="w-full bg-blue-500 text-white py-2 rounded font-bold">
+                                    Send Reset Link
+                                </button>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600">Remember your password? <a href="#" class="text-blue-500 font-bold">Back to Login</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mt-4">Forgot Password Screen</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-16">
+            <h2 class="text-2xl font-bold text-blue-700 mb-6">Login Screen Implementation</h2>
+            <div class="code-block mb-8">
+// src/screens/Auth/LoginScreen.js
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, 
+    StyleSheet, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../config/firebase';
+import { setUser, setLoading, setError } from '../../store/slices/authSlice';
+import Button from '../../components/common/Button';
+import Input from '../../components/common/Input';
+
+const LoginScreen = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
+  
+  const dispatch = useDispatch();
+
+  const validateForm = () => {
+    const errors = {};
+    if (!email) errors.email = 'Email is required';
+    if (!password) errors.password = 'Password is required';
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleLogin = async () => {
+    if (!validateForm()) return;
+    
+    try {
+      dispatch(setLoading(true));
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      dispatch(setUser({
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        displayName: userCredential.user.displayName,
+        photoURL: userCredential.user.photoURL
+      }));
+    } catch (error) {
+      dispatch(setError(error.message));
+      alert(error.message);
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View style={styles.logoContainer}>
+        <Image
+          source={require('../../assets/images/logo.png')}
+          style={styles.logo}
+        />
+        <Text style={styles.appName}>Travelogo</Text>
+      </View>
+
+      <View style={styles.formContainer}>
+        <Input
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          error={validationErrors.email}
+          iconName="email"
+        />
+
+        <Input
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          error={validationErrors.password}
+          iconName="lock"
+        />
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ForgotPassword')}
+          style={styles.forgotPassword}
+        >
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        </TouchableOpacity>
+
+        <Button title="Log In" onPress={handleLogin} />
+
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>Don't have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+            <Text style={styles.signupLink}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </KeyboardAvoidingView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    padding: 20,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 60,
+    marginBottom: 40,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+  },
+  appName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1e88e5',
+    marginTop: 10,
+  },
+  formContainer: {
+    width: '100%',
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginBottom: 20,
+  },
+  forgotPasswordText: {
+    color: '#1e88e5',
+    fontSize: 14,
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  signupText: {
+    color: '#666',
+  },
+  signupLink: {
+    color: '#1e88e5',
+    fontWeight: 'bold',
+  },
+});
+
+export default LoginScreen;
+            </div>
+        </div>
+
+        <div class="mb-16">
+            <h2 class="text-2xl font-bold text-blue-700 mb-6">Sign Up Screen Implementation</h2>
+            <div class="code-block mb-8">
+// src/screens/Auth/SignUpScreen.js
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, 
+    StyleSheet, KeyboardAvoidingView, Platform, Image, ScrollView } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../../config/firebase';
+import { setUser, setLoading, setError } from '../../store/slices/authSlice';
+import Button from '../../components/common/Button';
+import Input from '../../components/common/Input';
+
+const SignUpScreen = ({ navigation }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
+  
+  const dispatch = useDispatch();
+
+  const validateForm = () => {
+    const errors = {};
+    if (!name) errors.name = 'Name is required';
+    if (!email) errors.email = 'Email is required';
+    if (!password) errors.password = 'Password is required';
+    if (password.length < 6) errors.password = 'Password must be at least 6 characters';
+    if (password !== confirmPassword) errors.confirmPassword = 'Passwords do not match';
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSignUp = async () => {
+    if (!validateForm()) return;
+    
+    try {
+      dispatch(setLoading(true));
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Update profile with name
+      await updateProfile(userCredential.user, {
+        displayName: name
+      });
+      
+      // Create user document in Firestore
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        uid: userCredential.user.uid,
+        displayName: name,
+        email: email,
+        createdAt: new Date(),
+        friends: [],
+        plans: []
+      });
+      
+      dispatch(setUser({
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        displayName: name
+      }));
+    } catch (error) {
+      dispatch(setError(error.message));
+      alert(error.message);
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../../assets/images/logo.png')}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>Create Account</Text>
+        </View>
+
+        <View style={styles.formContainer}>
+          <Input
+            placeholder="Full Name"
+            value={name}
+            onChangeText={setName}
+            error={validationErrors.name}
+            iconName="person"
+          />
+
+          <Input
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            error={validationErrors.email}
+            iconName="email"
+          />
+
+          <Input
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            error={validationErrors.password}
+            iconName="lock"
+          />
+
+          <Input
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            error={validationErrors.confirmPassword}
+            iconName="lock"
+          />
+
+          <Button title="Sign Up" onPress={handleSignUp} />
+
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.loginLink}>Log In</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    padding: 20,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 40,
+    marginBottom: 30,
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    resizeMode: 'contain',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1e88e5',
+    marginTop: 10,
+  },
+  formContainer: {
+    width: '100%',
+  },
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  loginText: {
+    color: '#666',
+  },
+  loginLink: {
+    color: '#1e88e5',
+    fontWeight: 'bold',
+  },
+});
+
+export default SignUpScreen;
+            </div>
+        </div>
+
+        <div class="mb-16">
+            <h2 class="text-2xl font-bold text-blue-700 mb-6">Forgot Password Screen Implementation</h2>
+            <div class="code-block mb-8">
+// src/screens/Auth/ForgotPasswordScreen.js
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../../config/firebase';
+import Button from '../../components/common/Button';
+import Input from '../../components/common/Input';
+import { MaterialIcons } from '@expo/vector-icons';
+
+const ForgotPasswordScreen = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [validationError, setValidationError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const validateForm = () => {
+    if (!email) {
+      setValidationError('Email is required');
+      return false;
+    }
+    setValidationError('');
+    return true;
+  };
+
+  const handleResetPassword = async () => {
+    if (!validateForm()) return;
+    
+    try {
+      setIsSubmitting(true);
+      await sendPasswordResetEmail(auth, email);
+      setIsSuccess(true);
+    } catch (error) {
+      setValidationError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <TouchableOpacity 
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <MaterialIcons name="arrow-back" size={24} color="#1e88e5" />
+        <Text style={styles.backText}>Back</Text>
+      </TouchableOpacity>
+
+      <View style={styles.iconContainer}>
+        <View style={styles.iconBackground}>
+          <MaterialIcons name="vpn-key" size={40} color="#fff" />
+        </View>
+      </View>
+
+      <Text style={styles.title}>Forgot Password</Text>
+      
+      {!isSuccess ? (
+        <>
+          <Text style={styles.description}>
+            Enter your email address and we'll send you a link to reset your password.
+          </Text>
+
+          <View style={styles.formContainer}>
+            <Input
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              error={validationError}
+              iconName="email"
+            />
+
+            <Button 
+              title="Send Reset Link" 
+              onPress={handleResetPassword}
+              loading={isSubmitting}
+            />
+          </View>
+        </>
+      ) : (
+        <View style={styles.successContainer}>
+          <MaterialIcons name="check-circle" size={60} color="#4CAF50" />
+          <Text style={styles.successText}>
+            Password reset link sent to your email. Please check your inbox.
+          </Text>
+          <Button 
+            title="Back to Login" 
+            onPress={() => navigation.navigate('Login')}
+          />
+        </View>
+      )}
+
+      {!isSuccess && (
+        <View style={styles.loginContainer}>
+          <Text style={styles.loginText}>Remember your password? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginLink}>Back to Login</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </KeyboardAvoidingView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    padding: 20,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  backText: {
+    color: '#1e88e5',
+    marginLeft: 5,
+    fontSize: 16,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  iconBackground: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#1e88e5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  formContainer: {
+    width: '100%',
+  },
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  loginText: {
+    color: '#666',
+  },
+  loginLink: {
+    color: '#1e88e5',
+    fontWeight: 'bold',
+  },
+  successContainer: {
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  successText: {
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+});
+
+export default ForgotPasswordScreen;
+            </div>
+        </div>
+
+        <div class="mb-16">
+            <h2 class="text-2xl font-bold text-blue-700 mb-6">Authentication Service Implementation</h2>
+            <div class="code-block">
+// src/services/authService.js
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  updateProfile,
+  onAuthStateChanged
+} from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebase';
+
+// Sign in with email and password
+export const login = async (email, password) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userData = await getUserData(userCredential.user.uid);
+    return { user: userCredential.user, userData };
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Create a new user account
+export const register = async (name, email, password) => {
+  try {
+    // Create user in Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    
+    // Update profile with display name
+    await updateProfile(userCredential.user, {
+      displayName: name
+    });
+    
+    // Create user document in Firestore
+    const userData = {
+      uid: userCredential.user.uid,
+      displayName: name,
+      email: email,
+      photoURL: null,
+      createdAt: new Date(),
+      friends: [],
+      plans: []
+    };
+    
+    await setDoc(doc(db, 'users', userCredential.user.uid), userData);
+    
+    return { user: userCredential.user, userData };
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Sign out current user
+export const logout = async () => {
+  try {
+    await signOut(auth);
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Send password reset email
+export const resetPassword = async (email) => {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get user data from Firestore
+export const getUserData = async (userId) => {
+  try {
+    const docRef = doc(db, 'users', userId);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return docSnap.data();
+    } else {
+      throw new Error('User document not found');
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Set up auth state observer
+export const observeAuthState = (callback) => {
+  return onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        const userData = await getUserData(user.uid);
+        callback({ user, userData });
+      } catch (error) {
+        callback({ user, userData: null, error });
+      }
+    } else {
+      callback({ user: null, userData: null });
+    }
+  });
+};
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-blue-700 mb-6">Authentication Flow Diagram</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex flex-col items-center">
+                    <div class="bg-blue-100 p-4 rounded-md w-full max-w-lg mb-6">
+                        <h3 class="font-bold text-center text-blue-800 mb-2">User Signs Up</h3>
+                        <div class="flex justify-center">
+                            <div class="relative">
+                                <div class="h-12 w-40 bg-blue-500 rounded flex items-center justify-center text-white font-semibold">
+                                    Create Account
+                                </div>
+                                <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+                                    <i class="fas fa-arrow-down text-blue-500 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-green-100 p-4 rounded-md w-full max-w-lg mb-6 mt-2">
+                        <h3 class="font-bold text-center text-green-800 mb-2">Firebase Authentication</h3>
+                        <div class="flex justify-center">
+                            <div class="relative">
+                                <div class="h-12 w-48 bg-green-500 rounded flex items-center justify-center text-white font-semibold">
+                                    createUserWithEmailAndPassword
+                                </div>
+                                <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+                                    <i class="fas fa-arrow-down text-green-500 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-100 p-4 rounded-md w-full max-w-lg mb-6 mt-2">
+                        <h3 class="font-bold text-center text-yellow-800 mb-2">Create Firestore User Document</h3>
+                        <div class="flex justify-center">
+                            <div class="relative">
+                                <div class="h-12 w-48 bg-yellow-500 rounded flex items-center justify-center text-white font-semibold">
+                                    setDoc(doc(db, 'users', userId))
+                                </div>
+                                <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+                                    <i class="fas fa-arrow-down text-yellow-500 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-red-100 p-4 rounded-md w-full max-w-lg mb-6 mt-2">
+                        <h3 class="font-bold text-center text-red-800 mb-2">Redux State Update</h3>
+                        <div class="flex justify-center">
+                            <div class="relative">
+                                <div class="h-12 w-48 bg-red-500 rounded flex items-center justify-center text-white font-semibold">
+                                    dispatch(setUser(userData))
+                                </div>
+                                <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+                                    <i class="fas fa-arrow-down text-red-500 text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-100 p-4 rounded-md w-full max-w-lg mt-2">
+                        <h3 class="font-bold text-center text-purple-800 mb-2">Navigate to Main App</h3>
+                        <div class="flex justify-center">
+                            <div class="h-12 w-40 bg-purple-500 rounded flex items-center justify-center text-white font-semibold">
+                                MainTabNavigator
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

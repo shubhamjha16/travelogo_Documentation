@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travelogo App Configuration</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .color-swatch {
+            height: 50px;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .swatch-label {
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        .typography-example {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="p-8 max-w-5xl mx-auto">
+    <header class="mb-12">
+        <div class="flex items-center mb-6">
+            <div class="bg-blue-600 w-12 h-12 rounded-lg flex items-center justify-center mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800">Travelogo</h1>
+        </div>
+        <p class="text-xl text-gray-600">App Configuration Documentation</p>
+    </header>
+
+    <main>
+        <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">App.json Configuration</h2>
+            <p class="mb-4 text-gray-600">This file contains the configuration for the Expo build system.</p>
+            
+            <pre class="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
+{
+  "expo": {
+    "name": "Travelogo",
+    "slug": "travelogo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/icon.png",
+    "splash": {
+      "image": "./src/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1e88e5"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.travelogo",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "backgroundColor": "#1e88e5"
+      },
+      "package": "com.yourcompany.travelogo",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./src/assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Travelogo to use your location."
+        }
+      ]
+    ],
+    "notification": {
+      "icon": "./src/assets/notification-icon.png",
+      "color": "#1e88e5",
+      "iosDisplayInForeground": true,
+      "androidMode": "default"
+    }
+  }
+}
+            </pre>
+        </section>
+
+        <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Theme Configuration</h2>
+            <p class="mb-6 text-gray-600">The theme configuration defines the visual appearance of the Travelogo app.</p>
+            
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-gray-700">Color Palette</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Primary Colors -->
+                    <div>
+                        <div class="color-swatch" style="background-color: #1e88e5;"></div>
+                        <p class="swatch-label">Primary - #1e88e5</p>
+                    </div>
+                    <div>
+                        <div class="color-swatch" style="background-color: #1565c0;"></div>
+                        <p class="swatch-label">Primary Dark - #1565c0</p>
+                    </div>
+                    <div>
+                        <div class="color-swatch" style="background-color: #64b5f6;"></div>
+                        <p class="swatch-label">Primary Light - #64b5f6</p>
+                    </div>
+                    <div>
+                        <div class="color-swatch" style="background-color: #e3f2fd;"></div>
+                        <p class="swatch-label">Primary Pale - #e3f2fd</p>
+                    </div>
+                    
+                    <!-- Secondary Colors -->
+                    <div>
+                        <div class="color-swatch" style="background-color: #4caf50;"></div>
+                        <p class="swatch-label">Success - #4caf50</p>
+                    </div>
+                    <div>
+                        <div class="color-swatch" style="background-color: #f44336;"></div>
+                        <p class="swatch-label">Error - #f44336</p>
+                    </div>
+                    <div>
+                        <div class="color-swatch" style="background-color: #ff9800;"></div>
+                        <p class="swatch-label">Warning - #ff9800</p>
+                    </div>
+                    <div>
+                        <div class="color-swatch" style="background-color: #2196f3;"></div>
+                        <p class="swatch-label">Info - #2196f3</p>
+                    </div>
+                    
+                    <!-- Neutrals -->
+                    <div>
+                        <div class="color-swatch" style="background-color: #212121;"></div>
+                        <p class="swatch-label">Text Dark - #212121</p>
+                    </div>
+                    <div>
+                        <div class="color-swatch" style="background-color: #757575;"></div>
+                        <p class="swatch-label">Text Medium - #757575</p>
+                    </div>
+                    <div>
+                        <div class="color-swatch" style="background-color: #bdbdbd;"></div>
+                        <p class="swatch-label">Text Light - #bdbdbd</p>
+                    </div>
+                    <div>
+                        <div class="color-swatch" style="background-color: #f5f5f5;"></div>
+                        <p class="swatch-label">Background - #f5f5f5</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-gray-700">Typography</h3>
+                
+                <pre class="bg-gray-100 p-4 rounded-lg text-sm mb-4">
+// src/config/theme.js
+export const typography = {
+  fontFamily: {
+    primary: 'System',  // Uses San Francisco on iOS, Roboto on Android
+    secondary: 'Georgia'
+  },
+  fontSize: {
+    xs: 12,
+    sm: 14,
+    md: 16,
+    lg: 18,
+    xl: 20,
+    '2xl': 24,
+    '3xl': 30,
+    '4xl': 36
+  },
+  fontWeight: {
+    regular: '400',
+    medium: '500',
+    bold: '700'
+  }
+};
+                </pre>
+                
+                <div class="typography-example bg-white">
+                    <h1 style="font-size: 36px; font-weight: 700;" class="mb-2">Heading H1 (36px)</h1>
+                    <h2 style="font-size: 30px; font-weight: 700;" class="mb-2">Heading H2 (30px)</h2>
+                    <h3 style="font-size: 24px; font-weight: 700;" class="mb-2">Heading H3 (24px)</h3>
+                    <h4 style="font-size: 20px; font-weight: 700;" class="mb-2">Heading H4 (20px)</h4>
+                    <p style="font-size: 16px; font-weight: 400;" class="mb-2">Regular paragraph text (16px)</p>
+                    <p style="font-size: 14px; font-weight: 400;" class="mb-2">Small text (14px)</p>
+                    <p style="font-size: 12px; font-weight: 400;">Extra small text (12px)</p>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-gray-700">Spacing & Radius</h3>
+                
+                <pre class="bg-gray-100 p-4 rounded-lg text-sm">
+// src/config/theme.js
+export const spacing = {
+  xs: 4,   // Extra small: 4px
+  sm: 8,   // Small: 8px
+  md: 16,  // Medium: 16px
+  lg: 24,  // Large: 24px
+  xl: 32,  // Extra large: 32px
+  '2xl': 48  // Double extra large: 48px
+};
+
+export const borderRadius = {
+  none: 0,
+  sm: 4,    // Small: 4px
+  md: 8,    // Medium: 8px
+  lg: 16,   // Large: 16px
+  xl: 24,   // Extra large: 24px
+  full: 9999  // Fully rounded
+};
+                </pre>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-semibold mb-4 text-gray-700">Complete Theme File</h3>
+                
+                <pre class="bg-gray-100 p-4 rounded-lg text-sm">
+// src/config/theme.js
+const theme = {
+  colors: {
+    // Primary colors
+    primary: '#1e88e5',
+    primaryDark: '#1565c0', 
+    primaryLight: '#64b5f6',
+    primaryPale: '#e3f2fd',
+    
+    // Status colors
+    success: '#4caf50',
+    error: '#f44336',
+    warning: '#ff9800',
+    info: '#2196f3',
+    
+    // Text colors
+    textDark: '#212121',
+    textMedium: '#757575',
+    textLight: '#bdbdbd',
+    
+    // Background colors
+    background: '#f5f5f5',
+    card: '#ffffff',
+    border: '#e0e0e0',
+  },
+  
+  typography: {
+    fontFamily: {
+      primary: 'System',  // Uses San Francisco on iOS, Roboto on Android
+      secondary: 'Georgia'
+    },
+    fontSize: {
+      xs: 12,
+      sm: 14,
+      md: 16,
+      lg: 18,
+      xl: 20,
+      '2xl': 24,
+      '3xl': 30,
+      '4xl': 36
+    },
+    fontWeight: {
+      regular: '400',
+      medium: '500',
+      bold: '700'
+    }
+  },
+  
+  spacing: {
+    xs: 4,   // Extra small: 4px
+    sm: 8,   // Small: 8px
+    md: 16,  // Medium: 16px
+    lg: 24,  // Large: 24px
+    xl: 32,  // Extra large: 32px
+    '2xl': 48  // Double extra large: 48px
+  },
+  
+  borderRadius: {
+    none: 0,
+    sm: 4,    // Small: 4px
+    md: 8,    // Medium: 8px
+    lg: 16,   // Large: 16px
+    xl: 24,   // Extra large: 24px
+    full: 9999  // Fully rounded
+  },
+  
+  shadows: {
+    none: {
+      shadowColor: 'transparent',
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0,
+      shadowRadius: 0,
+      elevation: 0,
+    },
+    sm: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.18,
+      shadowRadius: 1.0,
+      elevation: 1,
+    },
+    md: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.23,
+      shadowRadius: 2.62,
+      elevation: 4,
+    },
+    lg: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.30,
+      shadowRadius: 4.65,
+      elevation: 8,
+    }
+  }
+};
+
+export default theme;
+                </pre>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Constants Configuration</h2>
+            <p class="mb-4 text-gray-600">Global constants used throughout the app.</p>
+
+            <pre class="bg-gray-100 p-4 rounded-lg text-sm">
+// src/config/constants.js
+export const API_TIMEOUT = 15000;  // 15 seconds
+
+export const IMAGE_QUALITY = {
+  HIGH: 0.9,
+  MEDIUM: 0.7,
+  LOW: 0.5
+};
+
+export const ACTIVITY_TYPES = [
+  { id: 'sightseeing', label: 'Sightseeing' },
+  { id: 'food', label: 'Food & Dining' },
+  { id: 'adventure', label: 'Adventure' },
+  { id: 'relaxation', label: 'Relaxation' },
+  { id: 'shopping', label: 'Shopping' },
+  { id: 'culture', label: 'Culture & History' },
+  { id: 'nature', label: 'Nature' },
+  { id: 'entertainment', label: 'Entertainment' },
+  { id: 'transit', label: 'Transit' },
+  { id: 'other', label: 'Other' }
+];
+
+export const VALIDATION_RULES = {
+  EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  PASSWORD_MIN_LENGTH: 6,
+  NAME_MAX_LENGTH: 50
+};
+
+export const DEFAULT_AVATAR = require('../assets/images/default-avatar.png');
+
+export const MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
+
+export const routes = {
+  AUTH: {
+    LOGIN: 'Login',
+    SIGNUP: 'SignUp',
+    FORGOT_PASSWORD: 'ForgotPassword'
+  },
+  MAIN: {
+    HOME: 'Home',
+    EXPLORE: 'Explore',
+    CREATE: 'Create',
+    PROFILE: 'Profile'
+  },
+  PLAN: {
+    DETAILS: 'PlanDetail',
+    CREATE: 'PlanCreate',
+    EDIT: 'PlanEdit'
+  },
+  MEDIA: {
+    SHARE: 'MediaShare',
+    VIEW: 'MediaView'
+  },
+  PROFILE: {
+    VIEW: 'ProfileView',
+    EDIT: 'EditProfile',
+    FRIENDS: 'FriendsList'
+  }
+};
+            </pre>
+        </section>
+    </main>
+
+    <footer class="mt-12 text-center text-gray-500 text-sm">
+        <p>Travelogo App Configuration Documentation &copy; 2023</p>
+    </footer>
+</body>
+</html>

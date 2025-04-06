@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travelogo Redux Store Implementation</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .code-block {
+      background-color: #f8f9fa;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      border-left: 4px solid #3b82f6;
+    }
+    .comment { color: #6b7280; }
+    .keyword { color: #7c3aed; }
+    .string { color: #059669; }
+    .function { color: #2563eb; }
+    .variable { color: #d97706; }
+    .constant { color: #db2777; }
+    .file-path {
+      background-color: #e5e7eb;
+      border-radius: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      font-family: monospace;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <div class="container mx-auto px-4 py-8 max-w-5xl">
+    <header class="mb-12 text-center">
+      <h1 class="text-4xl font-bold text-blue-600 mb-4">Travelogo Redux Store Implementation</h1>
+      <p class="text-xl text-gray-600">State management architecture for the travel planning application</p>
+    </header>
+
+    <div class="mb-12 bg-white shadow-md rounded-lg p-6">
+      <h2 class="text-2xl font-bold mb-4 text-blue-800">Redux Store Overview</h2>
+      <p class="mb-4">The Travelogo app uses Redux for global state management with Redux Toolkit to simplify the implementation. The store is structured into multiple slices representing different domains of the application:</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <h3 class="font-bold text-lg text-blue-700 flex items-center">
+            <i class="fas fa-user-shield mr-2"></i> Auth Slice
+          </h3>
+          <p class="mt-2 text-gray-700">Manages authentication state, user sessions, and login/logout operations</p>
+        </div>
+        
+        <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+          <h3 class="font-bold text-lg text-green-700 flex items-center">
+            <i class="fas fa-map-marked-alt mr-2"></i> Plans Slice
+          </h3>
+          <p class="mt-2 text-gray-700">Handles travel plans creation, retrieval, and updates</p>
+        </div>
+        
+        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+          <h3 class="font-bold text-lg text-yellow-700 flex items-center">
+            <i class="fas fa-users mr-2"></i> User Slice
+          </h3>
+          <p class="mt-2 text-gray-700">Manages user profiles, friends, and connections</p>
+        </div>
+        
+        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+          <h3 class="font-bold text-lg text-purple-700 flex items-center">
+            <i class="fas fa-images mr-2"></i> Feed Slice
+          </h3>
+          <p class="mt-2 text-gray-700">Controls the social feed, posts, and media sharing</p>
+        </div>
+      </div>
+    </div>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-6 text-blue-800">Store Configuration</h2>
+      <div class="file-path">src/store/index.js</div>
+      <div class="code-block">
+        <pre><span class="comment">// src/store/index.js</span>
+<span class="keyword">import</span> { <span class="variable">configureStore</span> } <span class="keyword">from</span> <span class="string">'@reduxjs/toolkit'</span>;
+<span class="keyword">import</span> <span class="variable">authReducer</span> <span class="keyword">from</span> <span class="string">'./slices/authSlice'</span>;
+<span class="keyword">import</span> <span class="variable">planReducer</span> <span class="keyword">from</span> <span class="string">'./slices/planSlice'</span>;
+<span class="keyword">import</span> <span class="variable">userReducer</span> <span class="keyword">from</span> <span class="string">'./slices/userSlice'</span>;
+<span class="keyword">import</span> <span class="variable">feedReducer</span> <span class="keyword">from</span> <span class="string">'./slices/feedSlice'</span>;
+
+<span class="comment">// Middleware for logging (development only)</span>
+<span class="keyword">const</span> <span class="variable">logger</span> = <span class="variable">store</span> => <span class="variable">next</span> => <span class="variable">action</span> => {
+  <span class="keyword">if</span> (<span class="variable">process</span>.<span class="variable">env</span>.<span class="constant">NODE_ENV</span> === <span class="string">'development'</span>) {
+    <span class="variable">console</span>.<span class="function">group</span>(<span class="variable">action</span>.<span class="variable">type</span>);
+    <span class="variable">console</span>.<span class="function">info</span>(<span class="string">'dispatching'</span>, <span class="variable">action</span>);
+  }
+  <span class="keyword">const</span> <span class="variable">result</span> = <span class="variable">next</span>(<span class="variable">action</span>);
+  <span class="keyword">if</span> (<span class="variable">process</span>.<span class="variable">env</span>.<span class="constant">NODE_ENV</span> === <span class="string">'development'</span>) {
+    <span class="variable">console</span>.<span class="function">log</span>(<span class="string">'next state'</span>, <span class="variable">store</span>.<span class="function">getState</span>());
+    <span class="variable">console</span>.<span class="function">groupEnd</span>();
+  }
+  <span class="keyword">return</span> <span class="variable">result</span>;
+};
+
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">store</span> = <span class="function">configureStore</span>({
+  <span class="variable">reducer</span>: {
+    <span class="variable">auth</span>: <span class="variable">authReducer</span>,
+    <span class="variable">plans</span>: <span class="variable">planReducer</span>,
+    <span class="variable">user</span>: <span class="variable">userReducer</span>,
+    <span class="variable">feed</span>: <span class="variable">feedReducer</span>,
+  },
+  <span class="variable">middleware</span>: (<span class="variable">getDefaultMiddleware</span>) => 
+    <span class="variable">getDefaultMiddleware</span>({
+      <span class="variable">serializableCheck</span>: {
+        <span class="comment">// Ignore these action types (for Firebase objects)</span>
+        <span class="variable">ignoredActions</span>: [<span class="string">'auth/setUser'</span>],
+        <span class="comment">// Ignore these field paths in all actions</span>
+        <span class="variable">ignoredActionPaths</span>: [<span class="string">'payload.user'</span>, <span class="string">'meta.arg'</span>],
+        <span class="comment">// Ignore these paths in the state</span>
+        <span class="variable">ignoredPaths</span>: [<span class="string">'auth.user'</span>],
+      },
+    }).<span class="function">concat</span>(<span class="variable">logger</span>),
+});
+
+<span class="comment">// Export types for TypeScript (optional)</span>
+<span class="keyword">export</span> <span class="keyword">type</span> <span class="variable">RootState</span> = <span class="function">ReturnType</span><<span class="keyword">typeof</span> <span class="variable">store</span>.<span class="function">getState</span>>;
+<span class="keyword">export</span> <span class="keyword">type</span> <span class="variable">AppDispatch</span> = <span class="keyword">typeof</span> <span class="variable">store</span>.<span class="variable">dispatch</span>;</pre>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-6 text-blue-800">Authentication Slice</h2>
+      <div class="file-path">src/store/slices/authSlice.js</div>
+      <div class="code-block">
+        <pre><span class="comment">// src/store/slices/authSlice.js</span>
+<span class="keyword">import</span> { <span class="variable">createSlice</span>, <span class="variable">createAsyncThunk</span> } <span class="keyword">from</span> <span class="string">'@reduxjs/toolkit'</span>;
+<span class="keyword">import</span> { 
+  <span class="variable">signInWithEmailAndPassword</span>, 
+  <span class="variable">createUserWithEmailAndPassword</span>,
+  <span class="variable">signOut</span>,
+  <span class="variable">updateProfile</span>,
+  <span class="variable">sendPasswordResetEmail</span>
+} <span class="keyword">from</span> <span class="string">'firebase/auth'</span>;
+<span class="keyword">import</span> { <span class="variable">doc</span>, <span class="variable">setDoc</span>, <span class="variable">getDoc</span> } <span class="keyword">from</span> <span class="string">'firebase/firestore'</span>;
+<span class="keyword">import</span> { <span class="variable">auth</span>, <span class="variable">db</span> } <span class="keyword">from</span> <span class="string">'../../config/firebase'</span>;
+
+<span class="comment">// Async thunk for logging in</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">loginUser</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'auth/login'</span>,
+  <span class="keyword">async</span> ({ <span class="variable">email</span>, <span class="variable">password</span> }, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">userCredential</span> = <span class="keyword">await</span> <span class="function">signInWithEmailAndPassword</span>(<span class="variable">auth</span>, <span class="variable">email</span>, <span class="variable">password</span>);
+      <span class="keyword">const</span> <span class="variable">userDoc</span> = <span class="keyword">await</span> <span class="function">getDoc</span>(<span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'users'</span>, <span class="variable">userCredential</span>.<span class="variable">user</span>.<span class="variable">uid</span>));
+      <span class="keyword">const</span> <span class="variable">userData</span> = <span class="variable">userDoc</span>.<span class="function">data</span>();
+      
+      <span class="keyword">return</span> {
+        <span class="variable">uid</span>: <span class="variable">userCredential</span>.<span class="variable">user</span>.<span class="variable">uid</span>,
+        <span class="variable">email</span>: <span class="variable">userCredential</span>.<span class="variable">user</span>.<span class="variable">email</span>,
+        <span class="variable">displayName</span>: <span class="variable">userCredential</span>.<span class="variable">user</span>.<span class="variable">displayName</span>,
+        <span class="variable">photoURL</span>: <span class="variable">userCredential</span>.<span class="variable">user</span>.<span class="variable">photoURL</span>,
+        ...<span class="variable">userData</span>
+      };
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Async thunk for user registration</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">registerUser</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'auth/register'</span>,
+  <span class="keyword">async</span> ({ <span class="variable">email</span>, <span class="variable">password</span>, <span class="variable">displayName</span> }, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">userCredential</span> = <span class="keyword">await</span> <span class="function">createUserWithEmailAndPassword</span>(<span class="variable">auth</span>, <span class="variable">email</span>, <span class="variable">password</span>);
+      
+      <span class="comment">// Update profile with display name</span>
+      <span class="keyword">await</span> <span class="function">updateProfile</span>(<span class="variable">userCredential</span>.<span class="variable">user</span>, {
+        <span class="variable">displayName</span>
+      });
+      
+      <span class="comment">// Create user document in Firestore</span>
+      <span class="keyword">await</span> <span class="function">setDoc</span>(<span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'users'</span>, <span class="variable">userCredential</span>.<span class="variable">user</span>.<span class="variable">uid</span>), {
+        <span class="variable">displayName</span>,
+        <span class="variable">email</span>,
+        <span class="variable">createdAt</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>(),
+        <span class="variable">friends</span>: [],
+        <span class="variable">bio</span>: <span class="string">''</span>,
+        <span class="variable">location</span>: <span class="string">''</span>
+      });
+      
+      <span class="keyword">return</span> {
+        <span class="variable">uid</span>: <span class="variable">userCredential</span>.<span class="variable">user</span>.<span class="variable">uid</span>,
+        <span class="variable">email</span>,
+        <span class="variable">displayName</span>
+      };
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Async thunk for logging out</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">logoutUser</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'auth/logout'</span>,
+  <span class="keyword">async</span> (_, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">await</span> <span class="function">signOut</span>(<span class="variable">auth</span>);
+      <span class="keyword">return</span> <span class="keyword">null</span>;
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Auth slice</span>
+<span class="keyword">const</span> <span class="variable">authSlice</span> = <span class="function">createSlice</span>({
+  <span class="variable">name</span>: <span class="string">'auth'</span>,
+  <span class="variable">initialState</span>: {
+    <span class="variable">user</span>: <span class="keyword">null</span>,
+    <span class="variable">loading</span>: <span class="keyword">false</span>,
+    <span class="variable">error</span>: <span class="keyword">null</span>,
+  },
+  <span class="variable">reducers</span>: {
+    <span class="variable">setUser</span>: (<span class="variable">state</span>, <span class="variable">action</span>) => {
+      <span class="variable">state</span>.<span class="variable">user</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+    },
+    <span class="variable">clearError</span>: (<span class="variable">state</span>) => {
+      <span class="variable">state</span>.<span class="variable">error</span> = <span class="keyword">null</span>;
+    },
+  },
+  <span class="variable">extraReducers</span>: (<span class="variable">builder</span>) => {
+    <span class="variable">builder</span>
+      <span class="comment">// Login cases</span>
+      .<span class="function">addCase</span>(<span class="variable">loginUser</span>.<span class="variable">pending</span>, (<span class="variable">state</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">true</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="keyword">null</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">loginUser</span>.<span class="variable">fulfilled</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">user</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">loginUser</span>.<span class="variable">rejected</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+      })
+      
+      <span class="comment">// Register cases</span>
+      .<span class="function">addCase</span>(<span class="variable">registerUser</span>.<span class="variable">pending</span>, (<span class="variable">state</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">true</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="keyword">null</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">registerUser</span>.<span class="variable">fulfilled</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">user</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">registerUser</span>.<span class="variable">rejected</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+      })
+      
+      <span class="comment">// Logout cases</span>
+      .<span class="function">addCase</span>(<span class="variable">logoutUser</span>.<span class="variable">pending</span>, (<span class="variable">state</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">true</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">logoutUser</span>.<span class="variable">fulfilled</span>, (<span class="variable">state</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">user</span> = <span class="keyword">null</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">logoutUser</span>.<span class="variable">rejected</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+      });
+  },
+});
+
+<span class="keyword">export</span> <span class="keyword">const</span> { <span class="variable">setUser</span>, <span class="variable">clearError</span> } = <span class="variable">authSlice</span>.<span class="variable">actions</span>;
+<span class="keyword">export</span> <span class="keyword">default</span> <span class="variable">authSlice</span>.<span class="variable">reducer</span>;</pre>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-6 text-blue-800">Plans Slice</h2>
+      <div class="file-path">src/store/slices/planSlice.js</div>
+      <div class="code-block">
+        <pre><span class="comment">// src/store/slices/planSlice.js</span>
+<span class="keyword">import</span> { <span class="variable">createSlice</span>, <span class="variable">createAsyncThunk</span> } <span class="keyword">from</span> <span class="string">'@reduxjs/toolkit'</span>;
+<span class="keyword">import</span> { 
+  <span class="variable">collection</span>, 
+  <span class="variable">addDoc</span>, 
+  <span class="variable">getDocs</span>, 
+  <span class="variable">getDoc</span>, 
+  <span class="variable">doc</span>, 
+  <span class="variable">updateDoc</span>, 
+  <span class="variable">deleteDoc</span>,
+  <span class="variable">query</span>,
+  <span class="variable">where</span>
+} <span class="keyword">from</span> <span class="string">'firebase/firestore'</span>;
+<span class="keyword">import</span> { <span class="variable">db</span> } <span class="keyword">from</span> <span class="string">'../../config/firebase'</span>;
+
+<span class="comment">// Create new travel plan</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">createPlan</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'plans/create'</span>,
+  <span class="keyword">async</span> ({ <span class="variable">planData</span>, <span class="variable">userId</span> }, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">planRef</span> = <span class="keyword">await</span> <span class="function">addDoc</span>(<span class="function">collection</span>(<span class="variable">db</span>, <span class="string">'plans'</span>), {
+        ...<span class="variable">planData</span>,
+        <span class="variable">userId</span>,
+        <span class="variable">participants</span>: [<span class="variable">userId</span>],
+        <span class="variable">createdAt</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>(),
+        <span class="variable">updatedAt</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>()
+      });
+      
+      <span class="keyword">return</span> {
+        <span class="variable">id</span>: <span class="variable">planRef</span>.<span class="variable">id</span>,
+        ...<span class="variable">planData</span>,
+        <span class="variable">userId</span>,
+        <span class="variable">participants</span>: [<span class="variable">userId</span>],
+        <span class="variable">createdAt</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>(),
+        <span class="variable">updatedAt</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>()
+      };
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Fetch user's travel plans</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">fetchUserPlans</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'plans/fetchUserPlans'</span>,
+  <span class="keyword">async</span> (<span class="variable">userId</span>, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">q</span> = <span class="function">query</span>(
+        <span class="function">collection</span>(<span class="variable">db</span>, <span class="string">'plans'</span>),
+        <span class="function">where</span>(<span class="string">'participants'</span>, <span class="string">'array-contains'</span>, <span class="variable">userId</span>)
+      );
+      
+      <span class="keyword">const</span> <span class="variable">querySnapshot</span> = <span class="keyword">await</span> <span class="function">getDocs</span>(<span class="variable">q</span>);
+      <span class="keyword">const</span> <span class="variable">plans</span> = [];
+      
+      <span class="variable">querySnapshot</span>.<span class="function">forEach</span>((<span class="variable">doc</span>) => {
+        <span class="variable">plans</span>.<span class="function">push</span>({
+          <span class="variable">id</span>: <span class="variable">doc</span>.<span class="variable">id</span>,
+          ...<span class="variable">doc</span>.<span class="function">data</span>()
+        });
+      });
+      
+      <span class="keyword">return</span> <span class="variable">plans</span>;
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Fetch a single plan by ID</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">fetchPlanById</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'plans/fetchPlanById'</span>,
+  <span class="keyword">async</span> (<span class="variable">planId</span>, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">planRef</span> = <span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'plans'</span>, <span class="variable">planId</span>);
+      <span class="keyword">const</span> <span class="variable">planSnap</span> = <span class="keyword">await</span> <span class="function">getDoc</span>(<span class="variable">planRef</span>);
+      
+      <span class="keyword">if</span> (<span class="variable">planSnap</span>.<span class="function">exists</span>()) {
+        <span class="keyword">return</span> {
+          <span class="variable">id</span>: <span class="variable">planSnap</span>.<span class="variable">id</span>,
+          ...<span class="variable">planSnap</span>.<span class="function">data</span>()
+        };
+      } <span class="keyword">else</span> {
+        <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="string">'Plan not found'</span>);
+      }
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Update a plan</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">updatePlan</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'plans/updatePlan'</span>,
+  <span class="keyword">async</span> ({ <span class="variable">planId</span>, <span class="variable">planData</span> }, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">planRef</span> = <span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'plans'</span>, <span class="variable">planId</span>);
+      <span class="keyword">await</span> <span class="function">updateDoc</span>(<span class="variable">planRef</span>, {
+        ...<span class="variable">planData</span>,
+        <span class="variable">updatedAt</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>()
+      });
+      
+      <span class="keyword">return</span> {
+        <span class="variable">id</span>: <span class="variable">planId</span>,
+        ...<span class="variable">planData</span>,
+        <span class="variable">updatedAt</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>()
+      };
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Add participant to plan</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">addParticipant</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'plans/addParticipant'</span>,
+  <span class="keyword">async</span> ({ <span class="variable">planId</span>, <span class="variable">userId</span> }, { <span class="variable">rejectWithValue</span>, <span class="variable">getState</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">planRef</span> = <span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'plans'</span>, <span class="variable">planId</span>);
+      <span class="keyword">const</span> <span class="variable">planSnap</span> = <span class="keyword">await</span> <span class="function">getDoc</span>(<span class="variable">planRef</span>);
+      
+      <span class="keyword">if</span> (!<span class="variable">planSnap</span>.<span class="function">exists</span>()) {
+        <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="string">'Plan not found'</span>);
+      }
+      
+      <span class="keyword">const</span> <span class="variable">planData</span> = <span class="variable">planSnap</span>.<span class="function">data</span>();
+      <span class="keyword">const</span> <span class="variable">participants</span> = [...<span class="variable">planData</span>.<span class="variable">participants</span>];
+      
+      <span class="keyword">if</span> (!<span class="variable">participants</span>.<span class="function">includes</span>(<span class="variable">userId</span>)) {
+        <span class="variable">participants</span>.<span class="function">push</span>(<span class="variable">userId</span>);
+        <span class="keyword">await</span> <span class="function">updateDoc</span>(<span class="variable">planRef</span>, {
+          <span class="variable">participants</span>,
+          <span class="variable">updatedAt</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>()
+        });
+      }
+      
+      <span class="keyword">return</span> {
+        <span class="variable">id</span>: <span class="variable">planId</span>,
+        <span class="variable">participants</span>
+      };
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Delete a plan</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">deletePlan</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'plans/deletePlan'</span>,
+  <span class="keyword">async</span> (<span class="variable">planId</span>, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">await</span> <span class="function">deleteDoc</span>(<span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'plans'</span>, <span class="variable">planId</span>));
+      <span class="keyword">return</span> <span class="variable">planId</span>;
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="keyword">const</span> <span class="variable">planSlice</span> = <span class="function">createSlice</span>({
+  <span class="variable">name</span>: <span class="string">'plans'</span>,
+  <span class="variable">initialState</span>: {
+    <span class="variable">plans</span>: [],
+    <span class="variable">currentPlan</span>: <span class="keyword">null</span>,
+    <span class="variable">loading</span>: <span class="keyword">false</span>,
+    <span class="variable">error</span>: <span class="keyword">null</span>,
+  },
+  <span class="variable">reducers</span>: {
+    <span class="variable">clearCurrentPlan</span>: (<span class="variable">state</span>) => {
+      <span class="variable">state</span>.<span class="variable">currentPlan</span> = <span class="keyword">null</span>;
+    },
+    <span class="variable">clearPlanError</span>: (<span class="variable">state</span>) => {
+      <span class="variable">state</span>.<span class="variable">error</span> = <span class="keyword">null</span>;
+    },
+  },
+  <span class="variable">extraReducers</span>: (<span class="variable">builder</span>) => {
+    <span class="variable">builder</span>
+      <span class="comment">// Create plan</span>
+      .<span class="function">addCase</span>(<span class="variable">createPlan</span>.<span class="variable">pending</span>, (<span class="variable">state</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">true</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="keyword">null</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">createPlan</span>.<span class="variable">fulfilled</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">plans</span>.<span class="function">push</span>(<span class="variable">action</span>.<span class="variable">payload</span>);
+        <span class="variable">state</span>.<span class="variable">currentPlan</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">createPlan</span>.<span class="variable">rejected</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+      })
+      
+      <span class="comment">// Fetch user plans</span>
+      .<span class="function">addCase</span>(<span class="variable">fetchUserPlans</span>.<span class="variable">pending</span>, (<span class="variable">state</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">true</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="keyword">null</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">fetchUserPlans</span>.<span class="variable">fulfilled</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">plans</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">fetchUserPlans</span>.<span class="variable">rejected</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+      });
+      
+      <span class="comment">// Additional cases for fetchPlanById, updatePlan, etc.</span>
+  },
+});
+
+<span class="keyword">export</span> <span class="keyword">const</span> { <span class="variable">clearCurrentPlan</span>, <span class="variable">clearPlanError</span> } = <span class="variable">planSlice</span>.<span class="variable">actions</span>;
+<span class="keyword">export</span> <span class="keyword">default</span> <span class="variable">planSlice</span>.<span class="variable">reducer</span>;</pre>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-6 text-blue-800">User & Feed Slices</h2>
+      <div class="flex flex-col md:flex-row gap-6">
+        <div class="md:w-1/2">
+          <div class="file-path">src/store/slices/userSlice.js</div>
+          <div class="code-block">
+            <pre><span class="comment">// src/store/slices/userSlice.js</span>
+<span class="keyword">import</span> { <span class="variable">createSlice</span>, <span class="variable">createAsyncThunk</span> } <span class="keyword">from</span> <span class="string">'@reduxjs/toolkit'</span>;
+<span class="keyword">import</span> { 
+  <span class="variable">doc</span>, 
+  <span class="variable">getDoc</span>, 
+  <span class="variable">updateDoc</span>, 
+  <span class="variable">arrayUnion</span>, 
+  <span class="variable">collection</span>, 
+  <span class="variable">query</span>, 
+  <span class="variable">where</span>, 
+  <span class="variable">getDocs</span> 
+} <span class="keyword">from</span> <span class="string">'firebase/firestore'</span>;
+<span class="keyword">import</span> { <span class="variable">db</span> } <span class="keyword">from</span> <span class="string">'../../config/firebase'</span>;
+
+<span class="comment">// Fetch user profile data</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">fetchUserProfile</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'user/fetchProfile'</span>,
+  <span class="keyword">async</span> (<span class="variable">userId</span>, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">userDoc</span> = <span class="keyword">await</span> <span class="function">getDoc</span>(<span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'users'</span>, <span class="variable">userId</span>));
+      
+      <span class="keyword">if</span> (<span class="variable">userDoc</span>.<span class="function">exists</span>()) {
+        <span class="keyword">return</span> {
+          <span class="variable">id</span>: <span class="variable">userId</span>,
+          ...<span class="variable">userDoc</span>.<span class="function">data</span>()
+        };
+      } <span class="keyword">else</span> {
+        <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="string">'User not found'</span>);
+      }
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Update user profile</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">updateUserProfile</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'user/updateProfile'</span>,
+  <span class="keyword">async</span> ({ <span class="variable">userId</span>, <span class="variable">userData</span> }, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">userRef</span> = <span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'users'</span>, <span class="variable">userId</span>);
+      <span class="keyword">await</span> <span class="function">updateDoc</span>(<span class="variable">userRef</span>, {
+        ...<span class="variable">userData</span>,
+        <span class="variable">updatedAt</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>()
+      });
+      
+      <span class="keyword">return</span> {
+        <span class="variable">id</span>: <span class="variable">userId</span>,
+        ...<span class="variable">userData</span>,
+        <span class="variable">updatedAt</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>()
+      };
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Add a friend</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">addFriend</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'user/addFriend'</span>,
+  <span class="keyword">async</span> ({ <span class="variable">userId</span>, <span class="variable">friendEmail</span> }, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="comment">// Find friend by email</span>
+      <span class="keyword">const</span> <span class="variable">q</span> = <span class="function">query</span>(
+        <span class="function">collection</span>(<span class="variable">db</span>, <span class="string">'users'</span>),
+        <span class="function">where</span>(<span class="string">'email'</span>, <span class="string">'=='</span>, <span class="variable">friendEmail</span>)
+      );
+      
+      <span class="keyword">const</span> <span class="variable">querySnapshot</span> = <span class="keyword">await</span> <span class="function">getDocs</span>(<span class="variable">q</span>);
+      <span class="keyword">if</span> (<span class="variable">querySnapshot</span>.<span class="variable">empty</span>) {
+        <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="string">'User not found'</span>);
+      }
+      
+      <span class="keyword">let</span> <span class="variable">friendId</span>;
+      <span class="keyword">let</span> <span class="variable">friendData</span>;
+      <span class="variable">querySnapshot</span>.<span class="function">forEach</span>(<span class="variable">doc</span> => {
+        <span class="variable">friendId</span> = <span class="variable">doc</span>.<span class="variable">id</span>;
+        <span class="variable">friendData</span> = <span class="variable">doc</span>.<span class="function">data</span>();
+      });
+      
+      <span class="keyword">if</span> (<span class="variable">friendId</span> === <span class="variable">userId</span>) {
+        <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="string">'Cannot add yourself as a friend'</span>);
+      }
+      
+      <span class="comment">// Add friend to user's friend list</span>
+      <span class="keyword">const</span> <span class="variable">userRef</span> = <span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'users'</span>, <span class="variable">userId</span>);
+      <span class="keyword">await</span> <span class="function">updateDoc</span>(<span class="variable">userRef</span>, {
+        <span class="variable">friends</span>: <span class="function">arrayUnion</span>(<span class="variable">friendId</span>)
+      });
+      
+      <span class="comment">// Add user to friend's friend list</span>
+      <span class="keyword">const</span> <span class="variable">friendRef</span> = <span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'users'</span>, <span class="variable">friendId</span>);
+      <span class="keyword">await</span> <span class="function">updateDoc</span>(<span class="variable">friendRef</span>, {
+        <span class="variable">friends</span>: <span class="function">arrayUnion</span>(<span class="variable">userId</span>)
+      });
+      
+      <span class="keyword">return</span> {
+        <span class="variable">id</span>: <span class="variable">friendId</span>,
+        <span class="variable">displayName</span>: <span class="variable">friendData</span>.<span class="variable">displayName</span>,
+        <span class="variable">email</span>: <span class="variable">friendData</span>.<span class="variable">email</span>,
+        <span class="variable">photoURL</span>: <span class="variable">friendData</span>.<span class="variable">photoURL</span> || <span class="keyword">null</span>
+      };
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="keyword">const</span> <span class="variable">userSlice</span> = <span class="function">createSlice</span>({
+  <span class="variable">name</span>: <span class="string">'user'</span>,
+  <span class="variable">initialState</span>: {
+    <span class="variable">profile</span>: <span class="keyword">null</span>,
+    <span class="variable">friends</span>: [],
+    <span class="variable">loading</span>: <span class="keyword">false</span>,
+    <span class="variable">error</span>: <span class="keyword">null</span>,
+  },
+  <span class="variable">reducers</span>: {
+    <span class="variable">clearUserError</span>: (<span class="variable">state</span>) => {
+      <span class="variable">state</span>.<span class="variable">error</span> = <span class="keyword">null</span>;
+    },
+  },
+  <span class="variable">extraReducers</span>: (<span class="variable">builder</span>) => {
+    <span class="variable">builder</span>
+      <span class="comment">// Fetch profile</span>
+      .<span class="function">addCase</span>(<span class="variable">fetchUserProfile</span>.<span class="variable">pending</span>, (<span class="variable">state</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">true</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="keyword">null</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">fetchUserProfile</span>.<span class="variable">fulfilled</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">profile</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+        <span class="variable">state</span>.<span class="variable">friends</span> = [];
+      })
+      .<span class="function">addCase</span>(<span class="variable">fetchUserProfile</span>.<span class="variable">rejected</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+      });
+      
+      <span class="comment">// Additional cases...</span>
+  },
+});
+
+<span class="keyword">export</span> <span class="keyword">const</span> { <span class="variable">clearUserError</span> } = <span class="variable">userSlice</span>.<span class="variable">actions</span>;
+<span class="keyword">export</span> <span class="keyword">default</span> <span class="variable">userSlice</span>.<span class="variable">reducer</span>;</pre>
+          </div>
+        </div>
+        
+        <div class="md:w-1/2">
+          <div class="file-path">src/store/slices/feedSlice.js</div>
+          <div class="code-block">
+            <pre><span class="comment">// src/store/slices/feedSlice.js</span>
+<span class="keyword">import</span> { <span class="variable">createSlice</span>, <span class="variable">createAsyncThunk</span> } <span class="keyword">from</span> <span class="string">'@reduxjs/toolkit'</span>;
+<span class="keyword">import</span> { 
+  <span class="variable">collection</span>, 
+  <span class="variable">addDoc</span>, 
+  <span class="variable">getDocs</span>,
+  <span class="variable">query</span>,
+  <span class="variable">where</span>,
+  <span class="variable">orderBy</span>,
+  <span class="variable">limit</span>,
+  <span class="variable">doc</span>,
+  <span class="variable">updateDoc</span>,
+  <span class="variable">arrayUnion</span>,
+  <span class="variable">deleteDoc</span>
+} <span class="keyword">from</span> <span class="string">'firebase/firestore'</span>;
+<span class="keyword">import</span> { 
+  <span class="variable">ref</span>, 
+  <span class="variable">uploadBytes</span>, 
+  <span class="variable">getDownloadURL</span> 
+} <span class="keyword">from</span> <span class="string">'firebase/storage'</span>;
+<span class="keyword">import</span> { <span class="variable">db</span>, <span class="variable">storage</span> } <span class="keyword">from</span> <span class="string">'../../config/firebase'</span>;
+
+<span class="comment">// Create a new post</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">createPost</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'feed/createPost'</span>,
+  <span class="keyword">async</span> ({ <span class="variable">userId</span>, <span class="variable">planId</span>, <span class="variable">caption</span>, <span class="variable">mediaFile</span> }, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">let</span> <span class="variable">mediaUrl</span> = <span class="keyword">null</span>;
+      
+      <span class="comment">// Upload media if provided</span>
+      <span class="keyword">if</span> (<span class="variable">mediaFile</span>) {
+        <span class="keyword">const</span> <span class="variable">fileRef</span> = <span class="function">ref</span>(<span class="variable">storage</span>, `media/${<span class="variable">userId</span>}/${<span class="function">Date</span>.<span class="function">now</span>()}`);
+        <span class="keyword">await</span> <span class="function">uploadBytes</span>(<span class="variable">fileRef</span>, <span class="variable">mediaFile</span>);
+        <span class="variable">mediaUrl</span> = <span class="keyword">await</span> <span class="function">getDownloadURL</span>(<span class="variable">fileRef</span>);
+      }
+      
+      <span class="keyword">const</span> <span class="variable">postData</span> = {
+        <span class="variable">userId</span>,
+        <span class="variable">planId</span>,
+        <span class="variable">caption</span>,
+        <span class="variable">mediaUrl</span>,
+        <span class="variable">likes</span>: [],
+        <span class="variable">comments</span>: [],
+        <span class="variable">createdAt</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>()
+      };
+      
+      <span class="keyword">const</span> <span class="variable">postRef</span> = <span class="keyword">await</span> <span class="function">addDoc</span>(<span class="function">collection</span>(<span class="variable">db</span>, <span class="string">'posts'</span>), <span class="variable">postData</span>);
+      
+      <span class="keyword">return</span> {
+        <span class="variable">id</span>: <span class="variable">postRef</span>.<span class="variable">id</span>,
+        ...<span class="variable">postData</span>
+      };
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Fetch feed posts</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">fetchFeedPosts</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'feed/fetchPosts'</span>,
+  <span class="keyword">async</span> ({ <span class="variable">userId</span>, <span class="variable">friendIds</span> = [] }, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">userIds</span> = [<span class="variable">userId</span>, ...<span class="variable">friendIds</span>];
+      <span class="keyword">const</span> <span class="variable">q</span> = <span class="function">query</span>(
+        <span class="function">collection</span>(<span class="variable">db</span>, <span class="string">'posts'</span>),
+        <span class="function">where</span>(<span class="string">'userId'</span>, <span class="string">'in'</span>, <span class="variable">userIds</span>),
+        <span class="function">orderBy</span>(<span class="string">'createdAt'</span>, <span class="string">'desc'</span>),
+        <span class="function">limit</span>(20)
+      );
+      
+      <span class="keyword">const</span> <span class="variable">querySnapshot</span> = <span class="keyword">await</span> <span class="function">getDocs</span>(<span class="variable">q</span>);
+      <span class="keyword">const</span> <span class="variable">posts</span> = [];
+      
+      <span class="variable">querySnapshot</span>.<span class="function">forEach</span>((<span class="variable">doc</span>) => {
+        <span class="variable">posts</span>.<span class="function">push</span>({
+          <span class="variable">id</span>: <span class="variable">doc</span>.<span class="variable">id</span>,
+          ...<span class="variable">doc</span>.<span class="function">data</span>()
+        });
+      });
+      
+      <span class="keyword">return</span> <span class="variable">posts</span>;
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Like a post</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">likePost</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'feed/likePost'</span>,
+  <span class="keyword">async</span> ({ <span class="variable">postId</span>, <span class="variable">userId</span> }, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">postRef</span> = <span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'posts'</span>, <span class="variable">postId</span>);
+      <span class="keyword">await</span> <span class="function">updateDoc</span>(<span class="variable">postRef</span>, {
+        <span class="variable">likes</span>: <span class="function">arrayUnion</span>(<span class="variable">userId</span>)
+      });
+      
+      <span class="keyword">return</span> {
+        <span class="variable">postId</span>,
+        <span class="variable">userId</span>
+      };
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="comment">// Add comment to post</span>
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">addComment</span> = <span class="function">createAsyncThunk</span>(
+  <span class="string">'feed/addComment'</span>,
+  <span class="keyword">async</span> ({ <span class="variable">postId</span>, <span class="variable">userId</span>, <span class="variable">text</span> }, { <span class="variable">rejectWithValue</span> }) => {
+    <span class="keyword">try</span> {
+      <span class="keyword">const</span> <span class="variable">comment</span> = {
+        <span class="variable">userId</span>,
+        <span class="variable">text</span>,
+        <span class="variable">timestamp</span>: <span class="keyword">new</span> <span class="function">Date</span>().<span class="function">toISOString</span>()
+      };
+      
+      <span class="keyword">const</span> <span class="variable">postRef</span> = <span class="function">doc</span>(<span class="variable">db</span>, <span class="string">'posts'</span>, <span class="variable">postId</span>);
+      <span class="keyword">await</span> <span class="function">updateDoc</span>(<span class="variable">postRef</span>, {
+        <span class="variable">comments</span>: <span class="function">arrayUnion</span>(<span class="variable">comment</span>)
+      });
+      
+      <span class="keyword">return</span> {
+        <span class="variable">postId</span>,
+        <span class="variable">comment</span>
+      };
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+      <span class="keyword">return</span> <span class="function">rejectWithValue</span>(<span class="variable">error</span>.<span class="variable">message</span>);
+    }
+  }
+);
+
+<span class="keyword">const</span> <span class="variable">feedSlice</span> = <span class="function">createSlice</span>({
+  <span class="variable">name</span>: <span class="string">'feed'</span>,
+  <span class="variable">initialState</span>: {
+    <span class="variable">posts</span>: [],
+    <span class="variable">loading</span>: <span class="keyword">false</span>,
+    <span class="variable">error</span>: <span class="keyword">null</span>,
+  },
+  <span class="variable">reducers</span>: {
+    <span class="variable">clearFeedError</span>: (<span class="variable">state</span>) => {
+      <span class="variable">state</span>.<span class="variable">error</span> = <span class="keyword">null</span>;
+    },
+  },
+  <span class="variable">extraReducers</span>: (<span class="variable">builder</span>) => {
+    <span class="variable">builder</span>
+      <span class="comment">// Create post</span>
+      .<span class="function">addCase</span>(<span class="variable">createPost</span>.<span class="variable">pending</span>, (<span class="variable">state</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">true</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="keyword">null</span>;
+      })
+      .<span class="function">addCase</span>(<span class="variable">createPost</span>.<span class="variable">fulfilled</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">posts</span>.<span class="function">unshift</span>(<span class="variable">action</span>.<span class="variable">payload</span>);
+      })
+      .<span class="function">addCase</span>(<span class="variable">createPost</span>.<span class="variable">rejected</span>, (<span class="variable">state</span>, <span class="variable">action</span>) => {
+        <span class="variable">state</span>.<span class="variable">loading</span> = <span class="keyword">false</span>;
+        <span class="variable">state</span>.<span class="variable">error</span> = <span class="variable">action</span>.<span class="variable">payload</span>;
+      });
+      
+      <span class="comment">// Additional cases...</span>
+  },
+});
+
+<span class="keyword">export</span> <span class="keyword">const</span> { <span class="variable">clearFeedError</span> } = <span class="variable">feedSlice</span>.<span class="variable">actions</span>;
+<span class="keyword">export</span> <span class="keyword">default</span> <span class="variable">feedSlice</span>.<span class="variable">reducer</span>;</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-6 text-blue-800">Redux Store Architecture Diagram</h2>
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="mx-auto max-w-3xl">
+          <svg width="100%" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- Store -->
+            <rect x="350" y="50" width="100" height="60" rx="5" fill="#3b82f6" />
+            <text x="400" y="85" text-anchor="middle" fill="white" font-weight="bold">Redux Store</text>
+            
+            <!-- Slices -->
+            <rect x="150" y="170" width="100" height="50" rx="5" fill="#7c3aed" />
+            <text x="200" y="200" text-anchor="middle" fill="white" font-weight="bold">Auth Slice</text>
+            
+            <rect x="300" y="170" width="100" height="50" rx="5" fill="#059669" />
+            <text x="350" y="200" text-anchor="middle" fill="white" font-weight="bold">Plan Slice</text>
+            
+            <rect x="450" y="170" width="100" height="50" rx="5" fill="#d97706" />
+            <text x="500" y="200" text-anchor="middle" fill="white" font-weight="bold">User Slice</text>
+            
+            <rect x="600" y="170" width="100" height="50" rx="5" fill="#db2777" />
+            <text x="650" y="200" text-anchor="middle" fill="white" font-weight="bold">Feed Slice</text>
+            
+            <!-- Components -->
+            <rect x="150" y="300" width="90" height="40" rx="5" fill="#e5e7eb" stroke="#4b5563" />
+            <text x="195" y="325" text-anchor="middle" fill="#4b5563" font-weight="bold">Auth Screens</text>
+            
+            <rect x="300" y="300" width="90" height="40" rx="5" fill="#e5e7eb" stroke="#4b5563" />
+            <text x="345" y="325" text-anchor="middle" fill="#4b5563" font-weight="bold">Plan Screens</text>
+            
+            <rect x="450" y="300" width="90" height="40" rx="5" fill="#e5e7eb" stroke="#4b5563" />
+            <text x="495" y="325" text-anchor="middle" fill="#4b5563" font-weight="bold">User Screens</text>
+            
+            <rect x="600" y="300" width="90" height="40" rx="5" fill="#e5e7eb" stroke="#4b5563" />
+            <text x="645" y="325" text-anchor="middle" fill="#4b5563" font-weight="bold">Feed Screens</text>
+            
+            <!-- Connections -->
+            <line x1="400" y1="110" x2="200" y2="170" stroke="#4b5563" stroke-width="2" />
+            <line x1="400" y1="110" x2="350" y2="170" stroke="#4b5563" stroke-width="2" />
+            <line x1="400" y1="110" x2="500" y2="170" stroke="#4b5563" stroke-width="2" />
+            <line x1="400" y1="110" x2="650" y2="170" stroke="#4b5563" stroke-width="2" />
+            
+            <line x1="200" y1="220" x2="195" y2="300" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,5" />
+            <line x1="350" y1="220" x2="345" y2="300" stroke="#059669" stroke-width="2" stroke-dasharray="5,5" />
+            <line x1="500" y1="220" x2="495" y2="300" stroke="#d97706" stroke-width="2" stroke-dasharray="5,5" />
+            <line x1="650" y1="220" x2="645" y2="300" stroke="#db2777" stroke-width="2" stroke-dasharray="5,5" />
+            
+            <!-- Database -->
+            <rect x="350" y="10" width="100" height="30" rx="5" fill="#f3f4f6" stroke="#4b5563" />
+            <text x="400" y="30" text-anchor="middle" fill="#4b5563">Firebase</text>
+            <line x1="400" y1="40" x2="400" y2="50" stroke="#4b5563" stroke-width="2" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-6 text-blue-800">Key Redux Implementation Patterns</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-bold mb-3 text-indigo-700">Async Thunks Pattern</h3>
+          <p class="mb-2">Redux Toolkit's <code class="bg-gray-100 px-1 rounded">createAsyncThunk</code> manages asynchronous operations with Firebase:</p>
+          <ul class="list-disc pl-6 space-y-1 text-gray-700">
+            <li>Creates standardized pending/fulfilled/rejected actions</li>
+            <li>Handles loading states and errors consistently</li>
+            <li>Centralizes Firebase interaction logic</li>
+            <li>Provides clean error handling with <code>rejectWithValue</code></li>
+          </ul>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-bold mb-3 text-green-700">State Normalization</h3>
+          <p class="mb-2">Organized state structure for efficient data management:</p>
+          <ul class="list-disc pl-6 space-y-1 text-gray-700">
+            <li>Entities stored with unique IDs as keys</li>
+            <li>Relationship references use IDs instead of nested objects</li>
+            <li>Prevents duplicated data across the store</li>
+            <li>Improves performance for large datasets</li>
+          </ul>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-bold mb-3 text-yellow-700">Firebase Integration</h3>
+          <p class="mb-2">Redux works with Firebase services through custom middleware:</p>
+          <ul class="list-disc pl-6 space-y-1 text-gray-700">
+            <li>Real-time data sync using Redux actions</li>
+            <li>Firestore serialization handling</li>
+            <li>Cached query results for optimized performance</li>
+            <li>Auth state persistence and synchronization</li>
+          </ul>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-bold mb-3 text-pink-700">Performance Optimizations</h3>
+          <p class="mb-2">Techniques to optimize Redux for mobile performance:</p>
+          <ul class="list-disc pl-6 space-y-1 text-gray-700">
+            <li>Memoized selectors with reselect</li>
+            <li>Minimized re-renders through careful state structure</li>
+            <li>Batched updates for multiple state changes</li>
+            <li>Serializable state for DevTools and time-travel debugging</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer class="mt-16 pt-8 border-t border-gray-200 text-center text-gray-600">
+      <p>Travelogo Redux Store Implementation - React Native Travel Planning Application</p>
+    </footer>
+  </div>
+</body>
+</html>

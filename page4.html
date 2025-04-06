@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travelogo Navigation Structure</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="bg-blue-600 p-6">
+            <h1 class="text-3xl font-bold text-white">Travelogo Navigation Structure</h1>
+            <p class="text-blue-100 mt-2">Core navigation implementation for the React Native travel app</p>
+        </div>
+        
+        <div class="p-6">
+            <div class="mb-10">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 border-b pb-2">1. AppNavigator.js</h2>
+                <p class="text-gray-600 mb-4">Main navigator that handles authentication state and switches between auth and main flows.</p>
+                <pre class="rounded-lg bg-gray-900 p-4 text-sm text-left overflow-x-auto"><code class="language-javascript">// src/navigation/AppNavigator.js
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../config/firebase';
+import { setUser, clearUser } from '../store/slices/authSlice';
+
+import AuthNavigator from './AuthNavigator';
+import MainTabNavigator from './MainTabNavigator';
+import LoadingScreen from '../screens/Auth/LoadingScreen';
+
+const AppNavigator = () => {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Listen for authentication state changes
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      if (authUser) {
+        // User is signed in
+        dispatch(setUser({
+          uid: authUser.uid,
+          email: authUser.email,
+          displayName: authUser.displayName,
+          photoURL: authUser.photoURL,
+        }));
+      } else {
+        // User is signed out
+        dispatch(clearUser());
+      }
+      setIsLoading(false);
+    });
+
+    // Cleanup subscription
+    return unsubscribe;
+  }, [dispatch]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  return user ? <MainTabNavigator /> : <AuthNavigator />;
+};
+
+export default AppNavigator;</code></pre>
+            </div>
+
+            <div class="mb-10">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 border-b pb-2">2. AuthNavigator.js</h2>
+                <p class="text-gray-600 mb-4">Navigator for authentication screens including login, signup, and password reset.</p>
+                <pre class="rounded-lg bg-gray-900 p-4 text-sm text-left overflow-x-auto"><code class="language-javascript">// src/navigation/AuthNavigator.js
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import LoginScreen from '../screens/Auth/LoginScreen';
+import SignUpScreen from '../screens/Auth/SignUpScreen';
+import ForgotPasswordScreen from '../screens/Auth/ForgotPasswordScreen';
+
+const Stack = createNativeStackNavigator();
+
+const AuthNavigator = () => {
+  return (
+    <Stack.Navigator 
+      initialRouteName="Login"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#4F46E5',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+    >
+      <Stack.Screen 
+        name="Login" 
+        component={LoginScreen} 
+        options={{ 
+          title: 'Travelogo',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen 
+        name="SignUp" 
+        component={SignUpScreen} 
+        options={{ 
+          title: 'Create Account',
+        }}
+      />
+      <Stack.Screen 
+        name="ForgotPassword" 
+        component={ForgotPasswordScreen} 
+        options={{ 
+          title: 'Reset Password',
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+export default AuthNavigator;</code></pre>
+            </div>
+
+            <div class="mb-10">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 border-b pb-2">3. MainTabNavigator.js</h2>
+                <p class="text-gray-600 mb-4">Bottom tab navigator for the main app screens with nested stack navigators for each tab.</p>
+                <pre class="rounded-lg bg-gray-900 p-4 text-sm text-left overflow-x-auto"><code class="language-javascript">// src/navigation/MainTabNavigator.js
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
+
+// Home Stack
+import HomeScreen from '../screens/Main/HomeScreen';
+import PlanDetailScreen from '../screens/Main/PlanDetailScreen';
+
+// Explore Stack
+import ExploreScreen from '../screens/Main/ExploreScreen';
+
+// Create Plan Stack
+import PlanCreateScreen from '../screens/Main/PlanCreateScreen';
+import AddFriendScreen from '../screens/Main/AddFriendScreen';
+
+// Profile Stack
+import ProfileScreen from '../screens/Profile/ProfileScreen';
+import EditProfileScreen from '../screens/Profile/EditProfileScreen';
+import FriendsListScreen from '../screens/Profile/FriendsListScreen';
+import MediaShareScreen from '../screens/Main/MediaShareScreen';
+
+const Tab = createBottomTabNavigator();
+const HomeStack = createNativeStackNavigator();
+const ExploreStack = createNativeStackNavigator();
+const CreateStack = createNativeStackNavigator();
+const ProfileStack = createNativeStackNavigator();
+
+// Home Stack Navigator
+const HomeStackNavigator = () => {
+  return (
+    <HomeStack.Navigator>
+      <HomeStack.Screen 
+        name="HomeScreen" 
+        component={HomeScreen} 
+        options={{ title: 'Travel Feed' }}
+      />
+      <HomeStack.Screen 
+        name="PlanDetail" 
+        component={PlanDetailScreen} 
+        options={({ route }) => ({ title: route.params?.title || 'Travel Plan' })}
+      />
+      <HomeStack.Screen 
+        name="MediaShare" 
+        component={MediaShareScreen} 
+        options={{ title: 'Share Media' }}
+      />
+    </HomeStack.Navigator>
+  );
+};
+
+// Explore Stack Navigator
+const ExploreStackNavigator = () => {
+  return (
+    <ExploreStack.Navigator>
+      <ExploreStack.Screen 
+        name="ExploreScreen" 
+        component={ExploreScreen} 
+        options={{ title: 'Explore' }}
+      />
+    </ExploreStack.Navigator>
+  );
+};
+
+// Create Plan Stack Navigator
+const CreateStackNavigator = () => {
+  return (
+    <CreateStack.Navigator>
+      <CreateStack.Screen 
+        name="CreatePlan" 
+        component={PlanCreateScreen} 
+        options={{ title: 'Create Travel Plan' }}
+      />
+      <CreateStack.Screen 
+        name="AddFriend" 
+        component={AddFriendScreen} 
+        options={{ title: 'Add Friends' }}
+      />
+    </CreateStack.Navigator>
+  );
+};
+
+// Profile Stack Navigator
+const ProfileStackNavigator = () => {
+  return (
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen 
+        name="ProfileScreen" 
+        component={ProfileScreen} 
+        options={{ title: 'Profile' }}
+      />
+      <ProfileStack.Screen 
+        name="EditProfile" 
+        component={EditProfileScreen} 
+        options={{ title: 'Edit Profile' }}
+      />
+      <ProfileStack.Screen 
+        name="FriendsList" 
+        component={FriendsListScreen} 
+        options={{ title: 'Friends' }}
+      />
+    </ProfileStack.Navigator>
+  );
+};
+
+// Main Tab Navigator
+const MainTabNavigator = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === 'Home') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Explore') {
+            iconName = focused ? 'compass' : 'compass-outline';
+          } else if (route.name === 'Create') {
+            iconName = focused ? 'add-circle' : 'add-circle-outline';
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'person' : 'person-outline';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#4F46E5',
+        tabBarInactiveTintColor: 'gray',
+        headerShown: false,
+      })}
+    >
+      <Tab.Screen name="Home" component={HomeStackNavigator} />
+      <Tab.Screen name="Explore" component={ExploreStackNavigator} />
+      <Tab.Screen name="Create" component={CreateStackNavigator} />
+      <Tab.Screen name="Profile" component={ProfileStackNavigator} />
+    </Tab.Navigator>
+  );
+};
+
+export default MainTabNavigator;</code></pre>
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <h2 class="text-xl font-semibold mb-2 text-blue-800">Navigation Flow Summary</h2>
+                <p class="text-gray-700 mb-2">The Travelogo app uses a multi-level navigation structure:</p>
+                <ol class="list-decimal pl-5 text-gray-700">
+                    <li class="mb-2"><strong>AppNavigator</strong>: Root navigator that handles authentication state and switches between auth screens and main app.</li>
+                    <li class="mb-2"><strong>AuthNavigator</strong>: Stack navigator for authentication-related screens (login, signup, password reset).</li>
+                    <li class="mb-2"><strong>MainTabNavigator</strong>: Tab-based navigation for the main app with four tabs, each containing its own stack navigator:</li>
+                    <ul class="list-disc pl-8 mt-2">
+                        <li><strong>Home Tab</strong>: Travel feed and plan details</li>
+                        <li><strong>Explore Tab</strong>: Discover new travel destinations</li>
+                        <li><strong>Create Tab</strong>: Create new travel plans</li>
+                        <li><strong>Profile Tab</strong>: User profile management</li>
+                    </ul>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>

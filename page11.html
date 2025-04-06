@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travelogo Firebase Services</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            border-left: 4px solid #3b82f6;
+        }
+        @media print {
+            .page-break {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-blue-600 mb-2">Travelogo App</h1>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Firebase Service Modules</h2>
+            <p class="text-gray-600 max-w-3xl mx-auto">
+                Core service modules for handling Firebase interactions in the Travelogo travel planning and sharing application.
+                These services provide a clean API for authentication, data storage, retrieval, and media management.
+            </p>
+        </header>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-lock text-blue-500 text-xl mr-3"></i>
+                <h3 class="text-xl font-semibold text-gray-800">Authentication Service</h3>
+            </div>
+            <p class="mb-4 text-gray-600">Handles user authentication including login, signup, password reset, and session management.</p>
+            <div class="code-block">
+                <pre><code class="language-javascript">// src/services/authService.js
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut,
+  onAuthStateChanged 
+} from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebase';
+
+/**
+ * Sign in a user with email and password
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @returns {Promise} - Promise resolved with user object or rejected with error
+ */
+export const loginWithEmail = async (email, password) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    
+    // Get additional user data from Firestore
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (userDoc.exists()) {
+      return {
+        uid: user.uid,
+        email: user.email,
+        ...userDoc.data()
+      };
+    }
+    return {
+      uid: user.uid,
+      email: user.email
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Create a new user account
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @param {string} name - User full name
+ * @returns {Promise} - Promise resolved with user object or rejected with error
+ */
+export const registerWithEmail = async (email, password, name) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    
+    // Create user profile in Firestore
+    await setDoc(doc(db, 'users', user.uid), {
+      name,
+      email,
+      createdAt: new Date(),
+      friends: [],
+      photoURL: null
+    });
+    
+    return {
+      uid: user.uid,
+      email: user.email,
+      name
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Send password reset email
+ * @param {string} email - User email
+ * @returns {Promise} - Promise resolved when email is sent
+ */
+export const resetPassword = async (email) => {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Sign out the current user
+ * @returns {Promise} - Promise resolved when user is signed out
+ */
+export const logout = async () => {
+  try {
+    await signOut(auth);
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get the current authenticated user
+ * @returns {object|null} - User object or null if not authenticated
+ */
+export const getCurrentUser = () => {
+  return auth.currentUser;
+};
+
+/**
+ * Listen for authentication state changes
+ * @param {function} callback - Function to call when auth state changes
+ * @returns {function} - Unsubscribe function
+ */
+export const subscribeToAuthChanges = (callback) => {
+  return onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // Get user data from Firestore
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        callback({
+          uid: user.uid,
+          email: user.email,
+          ...userDoc.data()
+        });
+      } else {
+        callback({
+          uid: user.uid,
+          email: user.email
+        });
+      }
+    } else {
+      callback(null);
+    }
+  });
+};
+</code></pre>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-user text-blue-500 text-xl mr-3"></i>
+                <h3 class="text-xl font-semibold text-gray-800">User Service</h3>
+            </div>
+            <p class="mb-4 text-gray-600">Manages user profiles, friend relationships, and user data operations.</p>
+            <div class="code-block">
+                <pre><code class="language-javascript">// src/services/userService.js
+import { 
+  doc, 
+  getDoc, 
+  updateDoc, 
+  collection, 
+  query, 
+  where, 
+  getDocs,
+  arrayUnion,
+  arrayRemove
+} from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../config/firebase';
+
+/**
+ * Get user profile data
+ * @param {string} userId - User ID
+ * @returns {Promise} - Promise resolved with user data or rejected with error
+ */
+export const getUserProfile = async (userId) => {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (userDoc.exists()) {
+      return {
+        id: userDoc.id,
+        ...userDoc.data()
+      };
+    }
+    throw new Error('User not found');
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Update user profile
+ * @param {string} userId - User ID
+ * @param {object} data - User data to update
+ * @returns {Promise} - Promise resolved when update is complete
+ */
+export const updateUserProfile = async (userId, data) => {
+  try {
+    await updateDoc(doc(db, 'users', userId), data);
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Upload profile photo
+ * @param {string} userId - User ID
+ * @param {string} uri - Image URI
+ * @returns {Promise} - Promise resolved with download URL
+ */
+export const uploadProfilePhoto = async (userId, uri) => {
+  try {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    
+    const photoRef = ref(storage, `profiles/${userId}`);
+    await uploadBytes(photoRef, blob);
+    
+    const downloadURL = await getDownloadURL(photoRef);
+    
+    // Update user profile with photo URL
+    await updateDoc(doc(db, 'users', userId), {
+      photoURL: downloadURL
+    });
+    
+    return downloadURL;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Search for users by email
+ * @param {string} email - Email to search for
+ * @returns {Promise} - Promise resolved with array of matching users
+ */
+export const searchUsersByEmail = async (email) => {
+  try {
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('email', '==', email.toLowerCase()));
+    const querySnapshot = await getDocs(q);
+    
+    const users = [];
+    querySnapshot.forEach(doc => {
+      users.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    
+    return users;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Add a friend
+ * @param {string} userId - Current user ID
+ * @param {string} friendId - Friend user ID to add
+ * @returns {Promise} - Promise resolved when friend is added
+ */
+export const addFriend = async (userId, friendId) => {
+  try {
+    // Add friend to current user's friends list
+    await updateDoc(doc(db, 'users', userId), {
+      friends: arrayUnion(friendId)
+    });
+    
+    // Add current user to friend's friends list
+    await updateDoc(doc(db, 'users', friendId), {
+      friends: arrayUnion(userId)
+    });
+    
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Remove a friend
+ * @param {string} userId - Current user ID
+ * @param {string} friendId - Friend user ID to remove
+ * @returns {Promise} - Promise resolved when friend is removed
+ */
+export const removeFriend = async (userId, friendId) => {
+  try {
+    // Remove friend from current user's friends list
+    await updateDoc(doc(db, 'users', userId), {
+      friends: arrayRemove(friendId)
+    });
+    
+    // Remove current user from friend's friends list
+    await updateDoc(doc(db, 'users', friendId), {
+      friends: arrayRemove(userId)
+    });
+    
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get user's friends
+ * @param {string} userId - User ID
+ * @returns {Promise} - Promise resolved with array of friend objects
+ */
+export const getUserFriends = async (userId) => {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (!userDoc.exists()) {
+      throw new Error('User not found');
+    }
+    
+    const userData = userDoc.data();
+    const friendIds = userData.friends || [];
+    
+    if (friendIds.length === 0) {
+      return [];
+    }
+    
+    const friendPromises = friendIds.map(friendId => getDoc(doc(db, 'users', friendId)));
+    const friendDocs = await Promise.all(friendPromises);
+    
+    const friends = friendDocs
+      .filter(doc => doc.exists())
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    
+    return friends;
+  } catch (error) {
+    throw error;
+  }
+};
+</code></pre>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-map-marked-alt text-blue-500 text-xl mr-3"></i>
+                <h3 class="text-xl font-semibold text-gray-800">Plan Service</h3>
+            </div>
+            <p class="mb-4 text-gray-600">Handles travel plan creation, retrieval, updates, and deletion.</p>
+            <div class="code-block">
+                <pre><code class="language-javascript">// src/services/planService.js
+import { 
+  collection, 
+  addDoc, 
+  getDoc, 
+  getDocs, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  query, 
+  where, 
+  orderBy, 
+  serverTimestamp,
+  arrayUnion,
+  arrayRemove
+} from 'firebase/firestore';
+import { db } from '../config/firebase';
+
+/**
+ * Create a new travel plan
+ * @param {string} userId - User ID of the plan creator
+ * @param {object} planData - Plan data
+ * @returns {Promise} - Promise resolved with the created plan ID
+ */
+export const createPlan = async (userId, planData) => {
+  try {
+    const planRef = await addDoc(collection(db, 'plans'), {
+      ...planData,
+      userId,
+      participants: [userId],
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    
+    return planRef.id;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get a specific travel plan by ID
+ * @param {string} planId - Plan ID
+ * @returns {Promise} - Promise resolved with plan data
+ */
+export const getPlanById = async (planId) => {
+  try {
+    const planDoc = await getDoc(doc(db, 'plans', planId));
+    if (planDoc.exists()) {
+      return {
+        id: planDoc.id,
+        ...planDoc.data(),
+        createdAt: planDoc.data().createdAt?.toDate(),
+        updatedAt: planDoc.data().updatedAt?.toDate()
+      };
+    }
+    throw new Error('Plan not found');
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get all travel plans for a user
+ * @param {string} userId - User ID
+ * @returns {Promise} - Promise resolved with array of plans
+ */
+export const getUserPlans = async (userId) => {
+  try {
+    const plansQuery = query(
+      collection(db, 'plans'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(plansQuery);
+    const plans = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate(),
+      updatedAt: doc.data().updatedAt?.toDate()
+    }));
+    
+    return plans;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get plans where user is a participant
+ * @param {string} userId - User ID
+ * @returns {Promise} - Promise resolved with array of plans
+ */
+export const getParticipatingPlans = async (userId) => {
+  try {
+    const plansQuery = query(
+      collection(db, 'plans'),
+      where('participants', 'array-contains', userId),
+      orderBy('createdAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(plansQuery);
+    const plans = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate(),
+      updatedAt: doc.data().updatedAt?.toDate()
+    }));
+    
+    return plans;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Update a travel plan
+ * @param {string} planId - Plan ID
+ * @param {object} planData - Updated plan data
+ * @returns {Promise} - Promise resolved when update is complete
+ */
+export const updatePlan = async (planId, planData) => {
+  try {
+    await updateDoc(doc(db, 'plans', planId), {
+      ...planData,
+      updatedAt: serverTimestamp()
+    });
+    
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Delete a travel plan
+ * @param {string} planId - Plan ID
+ * @returns {Promise} - Promise resolved when deletion is complete
+ */
+export const deletePlan = async (planId) => {
+  try {
+    await deleteDoc(doc(db, 'plans', planId));
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Add a participant to a plan
+ * @param {string} planId - Plan ID
+ * @param {string} userId - User ID to add
+ * @returns {Promise} - Promise resolved when participant is added
+ */
+export const addParticipant = async (planId, userId) => {
+  try {
+    await updateDoc(doc(db, 'plans', planId), {
+      participants: arrayUnion(userId),
+      updatedAt: serverTimestamp()
+    });
+    
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Remove a participant from a plan
+ * @param {string} planId - Plan ID
+ * @param {string} userId - User ID to remove
+ * @returns {Promise} - Promise resolved when participant is removed
+ */
+export const removeParticipant = async (planId, userId) => {
+  try {
+    await updateDoc(doc(db, 'plans', planId), {
+      participants: arrayRemove(userId),
+      updatedAt: serverTimestamp()
+    });
+    
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Add an activity to a plan
+ * @param {string} planId - Plan ID
+ * @param {object} activity - Activity data
+ * @returns {Promise} - Promise resolved when activity is added
+ */
+export const addActivity = async (planId, activity) => {
+  try {
+    const planDoc = await getDoc(doc(db, 'plans', planId));
+    if (!planDoc.exists()) {
+      throw new Error('Plan not found');
+    }
+    
+    const planData = planDoc.data();
+    const activities = planData.activities || [];
+    
+    await updateDoc(doc(db, 'plans', planId), {
+      activities: [...activities, activity],
+      updatedAt: serverTimestamp()
+    });
+    
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Update an activity in a plan
+ * @param {string} planId - Plan ID
+ * @param {number} activityIndex - Index of activity to update
+ * @param {object} activityData - Updated activity data
+ * @returns {Promise} - Promise resolved when activity is updated
+ */
+export const updateActivity = async (planId, activityIndex, activityData) => {
+  try {
+    const planDoc = await getDoc(doc(db, 'plans', planId));
+    if (!planDoc.exists()) {
+      throw new Error('Plan not found');
+    }
+    
+    const planData = planDoc.data();
+    const activities = [...(planData.activities || [])];
+    
+    if (activityIndex >= 0 && activityIndex < activities.length) {
+      activities[activityIndex] = {
+        ...activities[activityIndex],
+        ...activityData
+      };
+      
+      await updateDoc(doc(db, 'plans', planId), {
+        activities,
+        updatedAt: serverTimestamp()
+      });
+      
+      return true;
+    }
+    
+    throw new Error('Activity not found');
+  } catch (error) {
+    throw error;
+  }
+};
+</code></pre>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-photo-video text-blue-500 text-xl mr-3"></i>
+                <h3 class="text-xl font-semibold text-gray-800">Media Service</h3>
+            </div>
+            <p class="mb-4 text-gray-600">Handles media uploads, retrieval and management for travel photos and videos.</p>
+            <div class="code-block">
+                <pre><code class="language-javascript">// src/services/mediaService.js
+import { 
+  ref, 
+  uploadBytes, 
+  getDownloadURL, 
+  deleteObject,
+  listAll 
+} from 'firebase/storage';
+import { 
+  collection, 
+  addDoc, 
+  getDoc, 
+  getDocs, 
+  query, 
+  where, 
+  doc, 
+  serverTimestamp 
+} from 'firebase/firestore';
+import { storage, db } from '../config/firebase';
+
+/**
+ * Upload a single media file
+ * @param {string} userId - User ID
+ * @param {Blob} file - File blob
+ * @param {string} type - File type (image/video)
+ * @returns {Promise} - Promise resolved with download URL
+ */
+export const uploadMedia = async (userId, file, type = 'image') => {
+  try {
+    const timestamp = Date.now();
+    const fileName = `${userId}_${timestamp}`;
+    const mediaRef = ref(storage, `media/${type}s/${fileName}`);
+    
+    await uploadBytes(mediaRef, file);
+    const downloadURL = await getDownloadURL(mediaRef);
+    
+    return downloadURL;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Upload multiple media files
+ * @param {string} userId - User ID
+ * @param {Array} files - Array of file blobs
+ * @returns {Promise} - Promise resolved with array of download URLs
+ */
+export const uploadMultipleMedia = async (userId, files) => {
+  try {
+    const uploadPromises = files.map((file, index) => {
+      const timestamp = Date.now();
+      const fileName = `${userId}_${timestamp}_${index}`;
+      const fileType = file.type.startsWith('image/') ? 'image' : 'video';
+      const mediaRef = ref(storage, `media/${fileType}s/${fileName}`);
+      
+      return uploadBytes(mediaRef, file).then(() => getDownloadURL(mediaRef));
+    });
+    
+    return Promise.all(uploadPromises);
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Create a new post with media
+ * @param {string} userId - User ID
+ * @param {string} planId - Plan ID (optional)
+ * @param {Array} mediaUrls - Array of media URLs
+ * @param {string} caption - Post caption
+ * @returns {Promise} - Promise resolved with post ID
+ */
+export const createPost = async (userId, planId, mediaUrls, caption) => {
+  try {
+    // Get plan details if planId is provided
+    let planDetails = {};
+    if (planId) {
+      const planDoc = await getDoc(doc(db, 'plans', planId));
+      if (planDoc.exists()) {
+        const planData = planDoc.data();
+        planDetails = {
+          planId,
+          planTitle: planData.title,
+          destination: planData.destination
+        };
+      }
+    }
+    
+    const postRef = await addDoc(collection(db, 'posts'), {
+      userId,
+      ...planDetails,
+      mediaUrls,
+      caption,
+      likes: [],
+      comments: [],
+      createdAt: serverTimestamp()
+    });
+    
+    return postRef.id;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get posts for a specific plan
+ * @param {string} planId - Plan ID
+ * @returns {Promise} - Promise resolved with array of posts
+ */
+export const getPlanPosts = async (planId) => {
+  try {
+    const postsQuery = query(
+      collection(db, 'posts'),
+      where('planId', '==', planId),
+      orderBy('createdAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(postsQuery);
+    const posts = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate()
+    }));
+    
+    return posts;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get user's posts
+ * @param {string} userId - User ID
+ * @returns {Promise} - Promise resolved with array of posts
+ */
+export const getUserPosts = async (userId) => {
+  try {
+    const postsQuery = query(
+      collection(db, 'posts'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(postsQuery);
+    const posts = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate()
+    }));
+    
+    return posts;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Delete a media file from storage
+ * @param {string} url - File URL to delete
+ * @returns {Promise} - Promise resolved when deletion is complete
+ */
+export const deleteMedia = async (url) => {
+  try {
+    // Extract the path from the URL
+    const mediaRef = ref(storage, url);
+    await deleteObject(mediaRef);
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get all media for a specific plan
+ * @param {string} planId - Plan ID
+ * @returns {Promise} - Promise resolved with array of media objects
+ */
+export const getPlanMedia = async (planId) => {
+  try {
+    const postsQuery = query(
+      collection(db, 'posts'),
+      where('planId', '==', planId)
+    );
+    
+    const querySnapshot = await getDocs(postsQuery);
+    let allMedia = [];
+    
+    querySnapshot.forEach(doc => {
+      const post = doc.data();
+      const postId = doc.id;
+      
+      if (post.mediaUrls && post.mediaUrls.length > 0) {
+        post.mediaUrls.forEach(url => {
+          allMedia.push({
+            url,
+            postId,
+            userId: post.userId,
+            caption: post.caption,
+            createdAt: post.createdAt?.toDate()
+          });
+        });
+      }
+    });
+    
+    // Sort by creation date
+    allMedia.sort((a, b) => b.createdAt - a.createdAt);
+    
+    return allMedia;
+  } catch (error) {
+    throw error;
+  }
+};
+</code></pre>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-rss text-blue-500 text-xl mr-3"></i>
+                <h3 class="text-xl font-semibold text-gray-800">Feed Service</h3>
+            </div>
+            <p class="mb-4 text-gray-600">Manages the social feed, including fetching posts, adding likes and comments.</p>
+            <div class="code-block">
+                <pre><code class="language-javascript">// src/services/feedService.js
+import { 
+  collection, 
+  query, 
+  where, 
+  orderBy, 
+  limit, 
+  getDocs, 
+  getDoc, 
+  updateDoc, 
+  doc, 
+  arrayUnion, 
+  arrayRemove 
+} from 'firebase/firestore';
+import { db } from '../config/firebase';
+
+/**
+ * Get feed posts for a user
+ * @param {string} userId - Current user ID
+ * @param {number} limitCount - Number of posts to fetch (default: 10)
+ * @returns {Promise} - Promise resolved with array of feed posts
+ */
+export const getFeedPosts = async (userId, limitCount = 10) => {
+  try {
+    // Get user's friend IDs
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (!userDoc.exists()) {
+      throw new Error('User not found');
+    }
+    
+    const userData = userDoc.data();
+    const friendIds = userData.friends || [];
+    
+    // Include user's own ID to see their posts too
+    const userIds = [userId, ...friendIds];
+    
+    // Query posts by user and friends
+    const postsQuery = query(
+      collection(db, 'posts'),
+      where('userId', 'in', userIds),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
+    );
+    
+    const querySnapshot = await getDocs(postsQuery);
+    const posts = [];
+    
+    // Get post data with user details
+    for (const postDoc of querySnapshot.docs) {
+      const postData = postDoc.data();
+      
+      // Get user details for the post
+      const postUserDoc = await getDoc(doc(db, 'users', postData.userId));
+      const userData = postUserDoc.exists() ? postUserDoc.data() : null;
+      
+      posts.push({
+        id: postDoc.id,
+        ...postData,
+        user: userData ? {
+          id: postData.userId,
+          name: userData.name,
+          photoURL: userData.photoURL
+        } : null,
+        createdAt: postData.createdAt?.toDate()
+      });
+    }
+    
+    return posts;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Like a post
+ * @param {string} postId - Post ID
+ * @param {string} userId - User ID
+ * @returns {Promise} - Promise resolved when like is added
+ */
+export const likePost = async (postId, userId) => {
+  try {
+    await updateDoc(doc(db, 'posts', postId), {
+      likes: arrayUnion(userId)
+    });
+    
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Unlike a post
+ * @param {string} postId - Post ID
+ * @param {string} userId - User ID
+ * @returns {Promise} - Promise resolved when like is removed
+ */
+export const unlikePost = async (postId, userId) => {
+  try {
+    await updateDoc(doc(db, 'posts', postId), {
+      likes: arrayRemove(userId)
+    });
+    
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Add a comment to a post
+ * @param {string} postId - Post ID
+ * @param {string} userId - User ID
+ * @param {string} text - Comment text
+ * @returns {Promise} - Promise resolved when comment is added
+ */
+export const addComment = async (postId, userId, text) => {
+  try {
+    const comment = {
+      userId,
+      text,
+      timestamp: new Date().toISOString()
+    };
+    
+    await updateDoc(doc(db, 'posts', postId), {
+      comments: arrayUnion(comment)
+    });
+    
+    return comment;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get posts with location
+ * @param {string} destination - Destination name
+ * @param {number} limitCount - Number of posts to fetch (default: 20)
+ * @returns {Promise} - Promise resolved with array of posts
+ */
+export const getDestinationPosts = async (destination, limitCount = 20) => {
+  try {
+    const postsQuery = query(
+      collection(db, 'posts'),
+      where('destination', '==', destination),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
+    );
+    
+    const querySnapshot = await getDocs(postsQuery);
+    const posts = [];
+    
+    // Get post data with user details
+    for (const postDoc of querySnapshot.docs) {
+      const postData = postDoc.data();
+      
+      // Get user details for the post
+      const postUserDoc = await getDoc(doc(db, 'users', postData.userId));
+      const userData = postUserDoc.exists() ? postUserDoc.data() : null;
+      
+      posts.push({
+        id: postDoc.id,
+        ...postData,
+        user: userData ? {
+          id: postData.userId,
+          name: userData.name,
+          photoURL: userData.photoURL
+        } : null,
+        createdAt: postData.createdAt?.toDate()
+      });
+    }
+    
+    return posts;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get trending destinations based on post count
+ * @param {number} limitCount - Number of destinations to fetch (default: 5)
+ * @returns {Promise} - Promise resolved with array of destinations
+ */
+export const getTrendingDestinations = async (limitCount = 5) => {
+  try {
+    const postsRef = collection(db, 'posts');
+    const querySnapshot = await getDocs(postsRef);
+    
+    // Count posts by destination
+    const destinationCounts = {};
+    querySnapshot.forEach(doc => {
+      const post = doc.data();
+      if (post.destination) {
+        destinationCounts[post.destination] = (destinationCounts[post.destination] || 0) + 1;
+      }
+    });
+    
+    // Convert to array and sort
+    const destinations = Object.keys(destinationCounts).map(destination => ({
+      name: destination,
+      count: destinationCounts[destination]
+    }));
+    
+    destinations.sort((a, b) => b.count - a.count);
+    
+    return destinations.slice(0, limitCount);
+  } catch (error) {
+    throw error;
+  }
+};
+</code></pre>
+            </div>
+        </div>
+
+        <footer class="text-center text-gray-500 text-sm py-8">
+            <p>Travelogo App - Firebase Service Implementation</p>
+            <p class="mt-2">&copy; 2023 Travelogo. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

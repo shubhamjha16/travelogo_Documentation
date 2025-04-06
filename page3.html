@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App.js for Travelogo</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body class="bg-gray-100 text-gray-900 px-6 py-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-3xl font-bold text-center mb-6">App.js - Main Entry Point</h1>
+        <p class="mb-6 text-gray-700">This is the main entry point for the Travelogo React Native application. It handles navigation, authentication state, and connects to Redux store.</p>
+        
+        <div class="bg-gray-800 rounded-lg p-4 overflow-auto">
+            <pre class="language-javascript"><code>// App.js
+import React, { useState, useEffect } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { Provider } from 'react-redux';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './src/config/firebase';
+import { store } from './src/store';
+
+// Navigation
+import AuthNavigator from './src/navigation/AuthNavigator';
+import AppNavigator from './src/navigation/AppNavigator';
+
+// Components
+import Loading from './src/components/common/Loading';
+
+export default function App() {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState(null);
+
+  // Handle user state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      if (initializing) setInitializing(false);
+    });
+
+    // Cleanup subscription on unmount
+    return unsubscribe;
+  }, [initializing]);
+
+  // Show loading screen while initializing
+  if (initializing) {
+    return <Loading />;
+  }
+
+  return (
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <StatusBar style="auto" />
+          {user ? <AppNavigator /> : <AuthNavigator />}
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </Provider>
+  );
+}
+</code></pre>
+        </div>
+
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Key Components</h2>
+            <ul class="list-disc pl-6 space-y-2">
+                <li><span class="font-semibold">Authentication State Management:</span> The app tracks Firebase authentication state using the <code class="bg-gray-200 px-1 py-0.5 rounded">onAuthStateChanged</code> listener.</li>
+                <li><span class="font-semibold">Navigation System:</span> Conditionally renders either the authentication screens or the main app screens based on user login state.</li>
+                <li><span class="font-semibold">Redux Integration:</span> Wraps the entire app with the Redux Provider to enable global state management.</li>
+                <li><span class="font-semibold">Safe Area Handling:</span> Uses React Native Safe Area Context to respect device-specific display areas.</li>
+                <li><span class="font-semibold">Loading State:</span> Shows a loading indicator while the authentication state is being determined.</li>
+            </ul>
+        </div>
+
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Navigation Structure</h2>
+            <p class="mb-4">The app uses two main navigation stacks:</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-blue-50 p-4 rounded-md">
+                    <h3 class="font-bold text-lg text-blue-800 mb-2">AuthNavigator</h3>
+                    <p>Handles unauthenticated user flows:</p>
+                    <ul class="list-disc pl-6 mt-2">
+                        <li>Login Screen</li>
+                        <li>Sign Up Screen</li>
+                        <li>Forgot Password Screen</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 p-4 rounded-md">
+                    <h3 class="font-bold text-lg text-green-800 mb-2">AppNavigator</h3>
+                    <p>Handles authenticated user flows:</p>
+                    <ul class="list-disc pl-6 mt-2">
+                        <li>Home Feed</li>
+                        <li>Travel Planning</li>
+                        <li>Media Sharing</li>
+                        <li>User Profile</li>
+                        <li>Friend Management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>

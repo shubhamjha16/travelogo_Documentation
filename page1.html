@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Configuration - Travelogo App</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        code {
+            font-family: 'Fira Code', monospace;
+        }
+        .code-block {
+            border-radius: 0.5rem;
+            background-color: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Fira Code', monospace;
+            line-height: 1.6;
+        }
+        .comment { color: #94a3b8; }
+        .keyword { color: #c084fc; }
+        .string { color: #86efac; }
+        .variable { color: #93c5fd; }
+        .function { color: #f9a8d4; }
+        .property { color: #fcd34d; }
+    </style>
+</head>
+<body class="p-8 max-w-4xl mx-auto">
+    <header class="mb-10">
+        <div class="flex items-center space-x-4">
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-lg">
+                <i class="fas fa-fire text-white text-2xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold">Firebase Configuration</h1>
+        </div>
+        <p class="mt-2 text-gray-600">For Travelogo React Native App</p>
+    </header>
+
+    <main>
+        <section class="mb-10">
+            <h2 class="text-xl font-semibold mb-4">Firebase Setup Overview</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <p class="mb-4">This file establishes the connection between your Travelogo app and Firebase services. It initializes:</p>
+                <ul class="list-disc pl-6 mb-6 space-y-2">
+                    <li><span class="font-medium">Firebase Authentication</span> - For user login/signup</li>
+                    <li><span class="font-medium">Firestore Database</span> - For storing travel plans, user data</li>
+                    <li><span class="font-medium">Firebase Storage</span> - For photo/video uploads</li>
+                    <li><span class="font-medium">Firebase Analytics</span> - For tracking app usage</li>
+                </ul>
+                <div class="flex items-center text-amber-600 bg-amber-50 p-3 rounded-lg">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                    <p class="text-sm">Keep your Firebase config values secure and never expose them in client-side code when deploying to production.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-10">
+            <h2 class="text-xl font-semibold mb-4">Firebase Configuration File</h2>
+            <p class="mb-3 text-gray-700">Create a file named <code class="bg-gray-100 px-2 py-1 rounded">src/services/firebase.js</code> with the following code:</p>
+            
+            <pre class="code-block p-6 overflow-x-auto">
+<span class="comment">// src/services/firebase.js</span>
+
+<span class="keyword">import</span> { <span class="variable">initializeApp</span> } <span class="keyword">from</span> <span class="string">'firebase/app'</span>;
+<span class="keyword">import</span> { <span class="variable">getAuth</span>, <span class="variable">initializeAuth</span>, <span class="variable">getReactNativePersistence</span> } <span class="keyword">from</span> <span class="string">'firebase/auth'</span>;
+<span class="keyword">import</span> { <span class="variable">getFirestore</span> } <span class="keyword">from</span> <span class="string">'firebase/firestore'</span>;
+<span class="keyword">import</span> { <span class="variable">getStorage</span> } <span class="keyword">from</span> <span class="string">'firebase/storage'</span>;
+<span class="keyword">import</span> { <span class="variable">getAnalytics</span> } <span class="keyword">from</span> <span class="string">'firebase/analytics'</span>;
+<span class="keyword">import</span> <span class="variable">AsyncStorage</span> <span class="keyword">from</span> <span class="string">'@react-native-async-storage/async-storage'</span>;
+
+<span class="comment">// Your Firebase configuration from the Firebase console</span>
+<span class="comment">// Replace these values with your own Firebase project settings</span>
+<span class="keyword">const</span> <span class="variable">firebaseConfig</span> = {
+  <span class="property">apiKey</span>: <span class="string">"YOUR_API_KEY"</span>,
+  <span class="property">authDomain</span>: <span class="string">"travelogo-app.firebaseapp.com"</span>,
+  <span class="property">projectId</span>: <span class="string">"travelogo-app"</span>,
+  <span class="property">storageBucket</span>: <span class="string">"travelogo-app.appspot.com"</span>,
+  <span class="property">messagingSenderId</span>: <span class="string">"123456789012"</span>,
+  <span class="property">appId</span>: <span class="string">"1:123456789012:web:a1b2c3d4e5f6a7b8c9d0e1"</span>,
+  <span class="property">measurementId</span>: <span class="string">"G-MEASUREMENT_ID"</span>
+};
+
+<span class="comment">// Initialize Firebase</span>
+<span class="keyword">const</span> <span class="variable">app</span> = <span class="function">initializeApp</span>(firebaseConfig);
+
+<span class="comment">// Initialize Firebase Auth with AsyncStorage persistence</span>
+<span class="keyword">export const</span> <span class="variable">auth</span> = <span class="function">initializeAuth</span>(app, {
+  <span class="property">persistence</span>: <span class="function">getReactNativePersistence</span>(AsyncStorage)
+});
+
+<span class="comment">// Initialize Firebase Firestore</span>
+<span class="keyword">export const</span> <span class="variable">db</span> = <span class="function">getFirestore</span>(app);
+
+<span class="comment">// Initialize Firebase Storage</span>
+<span class="keyword">export const</span> <span class="variable">storage</span> = <span class="function">getStorage</span>(app);
+
+<span class="comment">// Initialize Firebase Analytics</span>
+<span class="keyword">export const</span> <span class="variable">analytics</span> = <span class="function">getAnalytics</span>(app);
+
+<span class="comment">// Export the Firebase app instance as well</span>
+<span class="keyword">export default</span> app;</pre>
+        </section>
+
+        <section class="mb-10">
+            <h2 class="text-xl font-semibold mb-4">How to Use the Firebase Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-lg shadow-md">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-blue-100 p-2 rounded-full mr-3">
+                            <i class="fas fa-user-lock text-blue-600"></i>
+                        </div>
+                        <h3 class="font-medium">Authentication Example</h3>
+                    </div>
+                    <pre class="code-block p-4 text-sm">
+<span class="keyword">import</span> { <span class="variable">auth</span> } <span class="keyword">from</span> <span class="string">'../services/firebase'</span>;
+<span class="keyword">import</span> { <span class="variable">signInWithEmailAndPassword</span> } <span class="keyword">from</span> <span class="string">'firebase/auth'</span>;
+
+<span class="keyword">const</span> <span class="function">loginUser</span> = <span class="keyword">async</span> (email, password) => {
+  <span class="keyword">try</span> {
+    <span class="keyword">const</span> <span class="variable">userCredential</span> = <span class="keyword">await</span> <span class="function">signInWithEmailAndPassword</span>(
+      auth, 
+      email, 
+      password
+    );
+    <span class="keyword">return</span> userCredential.user;
+  } <span class="keyword">catch</span> (error) {
+    <span class="keyword">throw</span> error;
+  }
+};</pre>
+                </div>
+                
+                <div class="bg-white p-5 rounded-lg shadow-md">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-green-100 p-2 rounded-full mr-3">
+                            <i class="fas fa-database text-green-600"></i>
+                        </div>
+                        <h3 class="font-medium">Firestore Example</h3>
+                    </div>
+                    <pre class="code-block p-4 text-sm">
+<span class="keyword">import</span> { <span class="variable">db</span> } <span class="keyword">from</span> <span class="string">'../services/firebase'</span>;
+<span class="keyword">import</span> { <span class="variable">collection</span>, <span class="variable">addDoc</span> } <span class="keyword">from</span> <span class="string">'firebase/firestore'</span>;
+
+<span class="keyword">const</span> <span class="function">createTravelPlan</span> = <span class="keyword">async</span> (planData) => {
+  <span class="keyword">try</span> {
+    <span class="keyword">const</span> <span class="variable">docRef</span> = <span class="keyword">await</span> <span class="function">addDoc</span>(
+      <span class="function">collection</span>(db, <span class="string">'plans'</span>), 
+      {
+        ...planData,
+        <span class="property">userId</span>: auth.currentUser.uid,
+        <span class="property">createdAt</span>: <span class="keyword">new</span> <span class="function">Date</span>()
+      }
+    );
+    <span class="keyword">return</span> docRef.id;
+  } <span class="keyword">catch</span> (error) {
+    <span class="keyword">throw</span> error;
+  }
+};</pre>
+                </div>
+                
+                <div class="bg-white p-5 rounded-lg shadow-md">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-purple-100 p-2 rounded-full mr-3">
+                            <i class="fas fa-image text-purple-600"></i>
+                        </div>
+                        <h3 class="font-medium">Storage Example</h3>
+                    </div>
+                    <pre class="code-block p-4 text-sm">
+<span class="keyword">import</span> { <span class="variable">storage</span> } <span class="keyword">from</span> <span class="string">'../services/firebase'</span>;
+<span class="keyword">import</span> { <span class="variable">ref</span>, <span class="variable">uploadBytes</span>, <span class="variable">getDownloadURL</span> } <span class="keyword">from</span> <span class="string">'firebase/storage'</span>;
+
+<span class="keyword">const</span> <span class="function">uploadImage</span> = <span class="keyword">async</span> (uri) => {
+  <span class="keyword">const</span> <span class="variable">response</span> = <span class="keyword">await</span> <span class="function">fetch</span>(uri);
+  <span class="keyword">const</span> <span class="variable">blob</span> = <span class="keyword">await</span> response.<span class="function">blob</span>();
+  
+  <span class="keyword">const</span> <span class="variable">fileName</span> = `travel_${Date.<span class="function">now</span>()}.jpg`;
+  <span class="keyword">const</span> <span class="variable">storageRef</span> = <span class="function">ref</span>(storage, `images/${fileName}`);
+  
+  <span class="keyword">await</span> <span class="function">uploadBytes</span>(storageRef, blob);
+  <span class="keyword">return await</span> <span class="function">getDownloadURL</span>(storageRef);
+};</pre>
+                </div>
+                
+                <div class="bg-white p-5 rounded-lg shadow-md">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-red-100 p-2 rounded-full mr-3">
+                            <i class="fas fa-chart-pie text-red-600"></i>
+                        </div>
+                        <h3 class="font-medium">Analytics Example</h3>
+                    </div>
+                    <pre class="code-block p-4 text-sm">
+<span class="keyword">import</span> { <span class="variable">analytics</span> } <span class="keyword">from</span> <span class="string">'../services/firebase'</span>;
+<span class="keyword">import</span> { <span class="variable">logEvent</span> } <span class="keyword">from</span> <span class="string">'firebase/analytics'</span>;
+
+<span class="keyword">const</span> <span class="function">trackUserEvent</span> = (eventName, eventParams) => {
+  <span class="function">logEvent</span>(analytics, eventName, eventParams);
+};
+
+<span class="comment">// Track when a user creates a travel plan</span>
+<span class="function">trackUserEvent</span>(<span class="string">'plan_created'</span>, {
+  <span class="property">destination</span>: <span class="string">'Paris'</span>,
+  <span class="property">trip_duration</span>: 7
+});</pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-10">
+            <h2 class="text-xl font-semibold mb-4">Firebase Setup Steps</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <ol class="list-decimal pl-6 space-y-4">
+                    <li>
+                        <p class="font-medium">Create a Firebase Project</p>
+                        <p class="text-gray-600">Go to the <a href="https://console.firebase.google.com/" class="text-blue-600 hover:underline">Firebase Console</a> and create a new project named "Travelogo"</p>
+                    </li>
+                    <li>
+                        <p class="font-medium">Register Your App</p>
+                        <p class="text-gray-600">Add a new app to your Firebase project (select Android and iOS for React Native)</p>
+                    </li>
+                    <li>
+                        <p class="font-medium">Configure Firebase Services</p>
+                        <ul class="list-disc pl-6 mt-2 space-y-1 text-gray-600">
+                            <li>Enable Authentication with Email/Password and Google Sign-in</li>
+                            <li>Create a Firestore Database and set up initial security rules</li>
+                            <li>Set up Firebase Storage for user-generated content</li>
+                            <li>Enable Analytics to track app usage</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p class="font-medium">Install Required Packages</p>
+                        <pre class="bg-gray-100 p-3 rounded text-sm">yarn add firebase @react-native-async-storage/async-storage</pre>
+                    </li>
+                    <li>
+                        <p class="font-medium">Create the Firebase Configuration File</p>
+                        <p class="text-gray-600">Copy the code from above into <code class="bg-gray-100 px-1 rounded">src/services/firebase.js</code></p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Security Best Practices</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
+                <div class="flex items-start">
+                    <div class="bg-gray-100 p-2 rounded-full mt-1 mr-3">
+                        <i class="fas fa-shield-alt text-gray-700"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">Secure API Keys</h3>
+                        <p class="text-gray-600">For production, use environment variables or a secure configuration approach to protect your Firebase keys.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="bg-gray-100 p-2 rounded-full mt-1 mr-3">
+                        <i class="fas fa-lock text-gray-700"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">Firestore Rules</h3>
+                        <p class="text-gray-600">Implement proper security rules for your Firestore database to control access to your data.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="bg-gray-100 p-2 rounded-full mt-1 mr-3">
+                        <i class="fas fa-user-shield text-gray-700"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">Authentication State</h3>
+                        <p class="text-gray-600">Properly manage user authentication state and ensure protected routes are secured.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="bg-gray-100 p-2 rounded-full mt-1 mr-3">
+                        <i class="fas fa-cloud-upload-alt text-gray-700"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">Storage Security</h3>
+                        <p class="text-gray-600">Set up proper Firebase Storage rules to prevent unauthorized access to user uploads.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="mt-12 text-center text-gray-500 text-sm">
+        <p>Firebase Configuration Documentation for Travelogo Mobile App</p>
+    </footer>
+</body>
+</html>

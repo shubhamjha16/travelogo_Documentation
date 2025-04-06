@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travelogo App Directory Structure</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #374151;
+        }
+        .directory-structure {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+        }
+        .folder {
+            color: #3b82f6;
+        }
+        .file {
+            color: #1f2937;
+        }
+        .comment {
+            color: #6b7280;
+            font-style: italic;
+            margin-left: 8px;
+        }
+        .indent {
+            padding-left: 2rem;
+        }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-8">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Travelogo App Directory Structure</h1>
+        <p class="mb-6 text-gray-600">Complete project file structure for React Native Travelogo travel planning application.</p>
+        
+        <div class="directory-structure text-sm">
+            <div>
+                <span class="folder"><i class="fas fa-folder mr-2"></i>travelogo/</span>
+            </div>
+            <div class="indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>App.js</span>
+            </div>
+            <div class="indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>app.json</span>
+            </div>
+            <div class="indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>babel.config.js</span>
+            </div>
+            <div class="indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>package.json</span>
+            </div>
+            
+            <div class="indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>src/</span>
+            </div>
+            
+            <div class="indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>screens/</span><span class="comment">Screen components</span>
+            </div>
+            
+            <div class="indent indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>Auth/</span><span class="comment">Authentication screens</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>LoginScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>SignUpScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>ForgotPasswordScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>AuthStyles.js</span>
+            </div>
+            
+            <div class="indent indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>Main/</span><span class="comment">Main app screens</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>HomeScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>ExploreScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>CreatePlanScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>PlanDetailsScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>AddPeopleScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>FeedScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>NotificationsScreen.js</span>
+            </div>
+            
+            <div class="indent indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>Profile/</span><span class="comment">Profile related screens</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>ProfileScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>EditProfileScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>MyPlansScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>FriendsScreen.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>SettingsScreen.js</span>
+            </div>
+            
+            <div class="indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>components/</span><span class="comment">Reusable components</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>Button.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>Card.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>ImagePicker.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>MapView.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>MediaGrid.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>PlanItem.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>FriendItem.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>LoadingSpinner.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>ErrorMessage.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>FormInput.js</span>
+            </div>
+            
+            <div class="indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>navigation/</span><span class="comment">Navigation configuration</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>AppNavigator.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>AuthNavigator.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>MainTabNavigator.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>ProfileNavigator.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>NavigationService.js</span>
+            </div>
+            
+            <div class="indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>services/</span><span class="comment">API and service calls</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>AuthService.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>PlanService.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>UserService.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>MediaService.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>FriendService.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>NotificationService.js</span>
+            </div>
+            
+            <div class="indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>store/</span><span class="comment">Redux store</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>index.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>reducers/</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>authReducer.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>plansReducer.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>userReducer.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>feedReducer.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>actions/</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>authActions.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>planActions.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>userActions.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>feedActions.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>selectors/</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>authSelectors.js</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>planSelectors.js</span>
+            </div>
+            
+            <div class="indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>utils/</span><span class="comment">Utility functions</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>validation.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>dateUtils.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>locationUtils.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>imageUtils.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>storageUtils.js</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>constants.js</span>
+            </div>
+            
+            <div class="indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>assets/</span><span class="comment">Images and media</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>images/</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-image mr-2"></i>logo.png</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-image mr-2"></i>splash.png</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-image mr-2"></i>default-avatar.png</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-image mr-2"></i>placeholder.png</span>
+            </div>
+            <div class="indent indent indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>icons/</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>app-icon.png</span>
+            </div>
+            <div class="indent indent indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>tab-icons/</span>
+            </div>
+            
+            <div class="indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>config/</span><span class="comment">Configuration files</span>
+            </div>
+            <div class="indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>firebase.js</span>
+            </div>
+            <div class="indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>environment.js</span>
+            </div>
+            <div class="indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>theme.js</span>
+            </div>
+            
+            <div class="indent">
+                <span class="folder"><i class="fas fa-folder mr-2"></i>tests/</span><span class="comment">Test files</span>
+            </div>
+            <div class="indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>authTests.js</span>
+            </div>
+            <div class="indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>planTests.js</span>
+            </div>
+            <div class="indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>navigationTests.js</span>
+            </div>
+            <div class="indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>componentTests.js</span>
+            </div>
+            <div class="indent indent">
+                <span class="file"><i class="fas fa-file mr-2"></i>setupTests.js</span>
+            </div>
+        </div>
+        
+        <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+            <h2 class="text-xl font-semibold text-blue-700 mb-2">Directory Structure Notes</h2>
+            <ul class="list-disc ml-5 text-gray-700">
+                <li class="mb-1">The structure follows the recommended React Native organization with separate folders for screens, components, and services</li>
+                <li class="mb-1">Navigation is organized by app section (auth, main, profile) for better maintainability</li>
+                <li class="mb-1">Redux store follows the standard action/reducer/selector pattern</li>
+                <li class="mb-1">Firebase configuration is isolated in the config directory</li>
+                <li class="mb-1">Utility functions are grouped by domain (dates, validation, etc.)</li>
+                <li class="mb-1">Tests mirror the application structure for easier correlation</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
